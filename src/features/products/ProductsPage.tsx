@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Container } from '../../components/Container'
 import { SectionTitle } from '../../components/SectionTitle'
 import { Card } from '../../components/Card'
@@ -7,6 +7,8 @@ import { Button } from '../../components/Button'
 import { useProducts } from '../../lib/hooks/useProducts'
 import type { Product } from '../../lib/api/endpoints/catalog'
 import { Link } from 'react-router-dom'
+import { FilterSidebar } from '../../components/FilterSidebar'
+import { SortDropdown } from '../../components/SortDropdown'
 
 type SortOption = 'price-low' | 'price-high' | 'newest'
 
@@ -15,6 +17,8 @@ export function ProductsPage() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [sortOption, setSortOption] = useState<SortOption>('newest')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   const categories: Product['category'][] = ['COOKIE', 'SNACK', 'CAKE', 'SWEET', 'HAMPER']
   const availableTags = ['organic', 'sugar-free', 'eco-friendly', 'artisan', 'guilt-free']
@@ -23,6 +27,16 @@ export function ProductsPage() {
     if (!products) return []
 
     let filtered = products.filter((product) => {
+      // Search filter
+      if (searchQuery.trim().length > 0) {
+        const query = searchQuery.toLowerCase().trim()
+        const matchesName = product.name.toLowerCase().includes(query)
+        const matchesDescription = product.description.toLowerCase().includes(query)
+        if (!matchesName && !matchesDescription) {
+          return false
+        }
+      }
+
       // Category filter
       if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
         return false
@@ -53,7 +67,7 @@ export function ProductsPage() {
     })
 
     return filtered
-  }, [products, selectedCategories, selectedTags, sortOption])
+  }, [products, selectedCategories, selectedTags, sortOption, searchQuery])
 
   const toggleCategory = (category: string) => {
     setSelectedCategories((prev) =>
@@ -70,14 +84,77 @@ export function ProductsPage() {
   const clearFilters = () => {
     setSelectedCategories([])
     setSelectedTags([])
+    setSearchQuery('')
     setSortOption('newest')
   }
+
+  const activeFilters = [
+    ...selectedCategories.map((cat) => ({
+      type: 'category' as const,
+      label: cat.charAt(0) + cat.slice(1).toLowerCase(),
+      value: cat,
+    })),
+    ...selectedTags.map((tag) => ({
+      type: 'tag' as const,
+      label: tag.charAt(0).toUpperCase() + tag.slice(1).replace('-', ' '),
+      value: tag,
+    })),
+  ]
+
+  const removeFilter = (type: 'category' | 'tag', value: string) => {
+    if (type === 'category') {
+      setSelectedCategories((prev) => prev.filter((c) => c !== value))
+    } else {
+      setSelectedTags((prev) => prev.filter((t) => t !== value))
+    }
+  }
+
+  // Keyboard navigation: ESC to close mobile filter drawer
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isMobileFilterOpen) {
+        setIsMobileFilterOpen(false)
+      }
+    }
+
+    if (isMobileFilterOpen) {
+      document.addEventListener('keydown', handleEscape)
+      // Prevent body scroll when drawer is open
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = ''
+    }
+  }, [isMobileFilterOpen])
 
   if (isLoading) {
     return (
       <Container>
         <div className="py-12">
-          <div className="text-center text-charcoal-600">Loading products...</div>
+          <SectionTitle
+            title="Our Products"
+            subtitle="Premium, handcrafted gift hampers and treats"
+            align="center"
+          />
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white rounded-xl shadow-card overflow-hidden animate-pulse"
+              >
+                <div className="aspect-square w-full bg-beige-200"></div>
+                <div className="p-6">
+                  <div className="h-4 bg-beige-200 rounded w-3/4 mb-3"></div>
+                  <div className="h-4 bg-beige-200 rounded w-full mb-2"></div>
+                  <div className="h-4 bg-beige-200 rounded w-5/6"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </Container>
     )
@@ -102,82 +179,150 @@ export function ProductsPage() {
           align="center"
         />
 
-        {/* Filters and Sorting */}
-        <div className="mt-8 mb-8 space-y-6">
-          {/* Category Filters */}
-          <div>
-            <h3 className="text-sm font-medium text-charcoal-700 mb-3">Category</h3>
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => toggleCategory(category)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCategories.includes(category)
-                      ? 'bg-charcoal-900 text-beige-50'
-                      : 'bg-beige-100 text-charcoal-700 hover:bg-beige-200'
-                  }`}
-                >
-                  {category.charAt(0) + category.slice(1).toLowerCase()}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Tag Filters */}
-          <div>
-            <h3 className="text-sm font-medium text-charcoal-700 mb-3">Tags</h3>
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedTags.includes(tag)
-                      ? 'bg-charcoal-900 text-beige-50'
-                      : 'bg-beige-100 text-charcoal-700 hover:bg-beige-200'
-                  }`}
-                >
-                  {tag.charAt(0).toUpperCase() + tag.slice(1).replace('-', ' ')}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Sort and Clear */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex items-center gap-3">
-              <label htmlFor="sort" className="text-sm font-medium text-charcoal-700">
-                Sort by:
-              </label>
-              <select
-                id="sort"
-                value={sortOption}
-                onChange={(e) => setSortOption(e.target.value as SortOption)}
-                className="px-4 py-2 rounded-lg border border-beige-300 bg-white text-charcoal-900 focus:outline-none focus:ring-2 focus:ring-charcoal-500"
-              >
-                <option value="newest">Newest</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-              </select>
-            </div>
-            {(selectedCategories.length > 0 || selectedTags.length > 0) && (
-              <Button variant="ghost" onClick={clearFilters} className="text-sm">
-                Clear Filters
-              </Button>
+        {/* Mobile Filter Toggle Button - Sticky */}
+        <div className="sticky top-16 z-30 bg-beige-50 -mx-4 px-4 py-3 mt-8 mb-4 lg:hidden border-b border-beige-200 shadow-sm">
+          <Button
+            variant="secondary"
+            onClick={() => setIsMobileFilterOpen(true)}
+            className="w-full sm:w-auto"
+          >
+            <svg
+              className="h-5 w-5 mr-2"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+            </svg>
+            Filters
+            {(selectedCategories.length > 0 || selectedTags.length > 0 || searchQuery.length > 0) && (
+              <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-charcoal-900 text-beige-50 rounded-full">
+                {selectedCategories.length + selectedTags.length + (searchQuery.length > 0 ? 1 : 0)}
+              </span>
             )}
-          </div>
+          </Button>
         </div>
 
-        {/* Results Count */}
-        {filteredAndSortedProducts.length > 0 && (
-          <p className="text-sm text-charcoal-600 mb-6">
-            Showing {filteredAndSortedProducts.length} of {products?.length || 0} products
-          </p>
-        )}
+        {/* Main Layout: Sidebar + Content */}
+        <div className="flex gap-8 mt-8">
+          {/* Filter Sidebar */}
+          <FilterSidebar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onToggleCategory={toggleCategory}
+            availableTags={availableTags}
+            selectedTags={selectedTags}
+            onToggleTag={toggleTag}
+            onClearFilters={clearFilters}
+            isMobile={false}
+            isOpen={isMobileFilterOpen}
+            onClose={() => setIsMobileFilterOpen(false)}
+          />
 
-        {filteredAndSortedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {/* Mobile Filter Sidebar */}
+          <FilterSidebar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            categories={categories}
+            selectedCategories={selectedCategories}
+            onToggleCategory={(cat) => {
+              toggleCategory(cat)
+              setIsMobileFilterOpen(false)
+            }}
+            availableTags={availableTags}
+            selectedTags={selectedTags}
+            onToggleTag={(tag) => {
+              toggleTag(tag)
+              setIsMobileFilterOpen(false)
+            }}
+            onClearFilters={() => {
+              clearFilters()
+              setIsMobileFilterOpen(false)
+            }}
+            isMobile={true}
+            isOpen={isMobileFilterOpen}
+            onClose={() => setIsMobileFilterOpen(false)}
+          />
+
+          {/* Main Content Area */}
+          <div className="flex-1 min-w-0">
+            {/* Toolbar: Sort + Results Count */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+              <div className="flex items-center gap-4">
+                <p className="text-sm text-charcoal-600">
+                  Showing <span className="font-medium text-charcoal-900">
+                    {filteredAndSortedProducts.length}
+                  </span>{' '}
+                  of <span className="font-medium text-charcoal-900">
+                    {products?.length || 0}
+                  </span>{' '}
+                  products
+                </p>
+              </div>
+              <SortDropdown value={sortOption} onChange={setSortOption} />
+            </div>
+
+            {/* Active Filter Pills */}
+            {(activeFilters.length > 0 || searchQuery.length > 0) && (
+              <div className="flex flex-wrap items-center gap-2 mb-6">
+                {searchQuery.length > 0 && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-beige-100 text-charcoal-700 rounded-full text-sm">
+                    <span>Search: "{searchQuery}"</span>
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      className="text-charcoal-500 hover:text-charcoal-900 transition-colors"
+                      aria-label="Remove search"
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                )}
+                {activeFilters.map((filter) => (
+                  <div
+                    key={`${filter.type}-${filter.value}`}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-beige-100 text-charcoal-700 rounded-full text-sm"
+                  >
+                    <span>{filter.label}</span>
+                    <button
+                      onClick={() => removeFilter(filter.type, filter.value)}
+                      className="text-charcoal-500 hover:text-charcoal-900 transition-colors"
+                      aria-label={`Remove ${filter.label} filter`}
+                    >
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path d="M6 18L18 6M6 6l12 12"></path>
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Product Grid */}
+            {filteredAndSortedProducts.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredAndSortedProducts.map((product) => (
               <Link key={product.id} to={`/products/${product.slug}`}>
                 <Card
@@ -223,22 +368,47 @@ export function ProductsPage() {
                   </div>
                 </Card>
               </Link>
-            ))}
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-charcoal-600 py-12">
+              {products && products.length > 0 ? (
+                <>
+                  <svg
+                    className="h-16 w-16 mx-auto text-charcoal-300 mb-4"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  <p className="text-lg font-medium text-charcoal-900 mb-2">
+                    No products match your filters
+                  </p>
+                  <p className="text-sm text-charcoal-600 mb-6">
+                    Try adjusting your search or filters to find what you're looking for.
+                  </p>
+                  <Button variant="primary" onClick={clearFilters}>
+                    Clear All Filters
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-lg font-medium text-charcoal-900 mb-2">
+                    No products available
+                  </p>
+                  <p className="text-sm text-charcoal-600">
+                    Check back soon for new products.
+                  </p>
+                </>
+              )}
+            </div>
+          )}
           </div>
-        ) : (
-          <div className="text-center text-charcoal-600 py-12">
-            {products && products.length > 0 ? (
-              <>
-                <p className="mb-4">No products match your filters.</p>
-                <Button variant="primary" onClick={clearFilters}>
-                  Clear Filters
-                </Button>
-              </>
-            ) : (
-              'No products available'
-            )}
-          </div>
-        )}
+        </div>
       </div>
     </Container>
   )

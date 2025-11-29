@@ -19,5 +19,7 @@ export const cartApi = {
     apiClient.post<CartItem>('/cart', { productId, quantity }),
   removeFromCart: (itemId: string) =>
     apiClient.delete(`/cart/${itemId}`),
+  updateCartQuantity: (itemId: string, quantity: number) =>
+    apiClient.put<CartItem>(`/cart/${itemId}`, { quantity }),
 }
 

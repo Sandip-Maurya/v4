@@ -2,15 +2,26 @@ import { useParams, Link } from 'react-router-dom'
 import { Container } from '../../components/Container'
 import { Badge } from '../../components/Badge'
 import { Button } from '../../components/Button'
-import { useProduct } from '../../lib/hooks/useProducts'
+import { Card } from '../../components/Card'
+import { SectionTitle } from '../../components/SectionTitle'
+import { useProduct, useProducts } from '../../lib/hooks/useProducts'
 import { useAddToCart } from '../../lib/hooks/useCart'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 export function ProductDetailPage() {
   const { slug } = useParams()
   const { data: product, isLoading, error } = useProduct(slug || '')
+  const { data: allProducts } = useProducts()
   const addToCartMutation = useAddToCart()
   const [selectedImageIndex, setSelectedImageIndex] = useState(0)
+
+  // Get related products (same category, exclude current product)
+  const relatedProducts = useMemo(() => {
+    if (!product || !allProducts) return []
+    return allProducts
+      .filter((p) => p.category === product.category && p.id !== product.id)
+      .slice(0, 4)
+  }, [product, allProducts])
 
   if (isLoading) {
     return (
@@ -144,6 +155,62 @@ export function ProductDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-16 pt-16 border-t border-beige-200">
+            <SectionTitle
+              title="Related Products"
+              subtitle="More handcrafted treats you might love"
+              align="center"
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+              {relatedProducts.map((relatedProduct) => (
+                <Link key={relatedProduct.id} to={`/products/${relatedProduct.slug}`}>
+                  <Card
+                    imageUrl={relatedProduct.images[0]}
+                    imageAlt={relatedProduct.name}
+                    hoverable
+                    className="h-full flex flex-col"
+                  >
+                    <div className="flex-grow">
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {relatedProduct.tags.slice(0, 2).map((tag) => (
+                          <Badge
+                            key={tag}
+                            label={tag}
+                            type={
+                              tag === 'organic'
+                                ? 'organic'
+                                : tag === 'eco-friendly'
+                                  ? 'eco-friendly'
+                                  : tag === 'sugar-free'
+                                    ? 'sugar-free'
+                                    : tag === 'artisan'
+                                      ? 'artisan'
+                                      : 'custom'
+                            }
+                          />
+                        ))}
+                      </div>
+                      <h3 className="text-lg font-heading text-charcoal-900 mb-2">
+                        {relatedProduct.name}
+                      </h3>
+                      <p className="text-sm text-charcoal-600 mb-4 line-clamp-2">
+                        {relatedProduct.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-beige-200">
+                      <span className="text-xl font-heading text-charcoal-900">
+                        ₹{relatedProduct.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </Container>
   )

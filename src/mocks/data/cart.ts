@@ -46,6 +46,25 @@ export function removeFromMockCart(itemId: string): void {
   mockCart.total = mockCart.items.reduce((sum, item) => sum + item.line_total, 0)
 }
 
+export function updateMockCartQuantity(itemId: string, quantity: number): CartItem {
+  const item = mockCart.items.find((item) => item.id === itemId)
+  if (!item) {
+    throw new Error('Cart item not found')
+  }
+
+  if (quantity <= 0) {
+    throw new Error('Quantity must be greater than 0')
+  }
+
+  item.quantity = quantity
+  item.line_total = item.product.price * quantity
+
+  // Recalculate total
+  mockCart.total = mockCart.items.reduce((sum, item) => sum + item.line_total, 0)
+
+  return item
+}
+
 export function clearMockCart(): void {
   mockCart = {
     items: [],

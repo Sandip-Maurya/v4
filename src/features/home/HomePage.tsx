@@ -186,9 +186,58 @@ export function HomePage() {
             subtitle="Eco-friendly packaging that's as thoughtful as our treats"
             align="center"
           />
-          <p className="text-center text-charcoal-600 mb-12">
-            Learn more about our sustainable practices...
-          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-12">
+            <div className="space-y-6">
+              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
+                <img
+                  src="https://images.unsplash.com/photo-1606312619070-d48b4bdc6e3c?w=800&q=80&auto=format&fit=crop"
+                  alt="Eco-friendly kraft paper packaging with jute bags"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
+                  Reusable Materials
+                </h3>
+                <p className="text-charcoal-700 leading-relaxed">
+                  Every hamper is thoughtfully wrapped in reusable kraft paper, jute bags, and 
+                  glass containers. These materials aren't just packaging—they're part of the 
+                  gift, designed to be used again and again in your home.
+                </p>
+              </div>
+            </div>
+            <div className="space-y-6">
+              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
+                <img
+                  src="https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80&auto=format&fit=crop"
+                  alt="Wooden trays and natural materials for sustainable packaging"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
+                  Conscious Living
+                </h3>
+                <p className="text-charcoal-700 leading-relaxed">
+                  We partner with local artisans who share our commitment to sustainability. 
+                  From wooden trays to cotton wraps, every element is chosen for its minimal 
+                  environmental impact and maximum beauty.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 bg-beige-50 rounded-xl p-8 lg:p-12">
+            <div className="max-w-3xl mx-auto text-center">
+              <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
+                Our Commitment
+              </h3>
+              <p className="text-lg text-charcoal-700 leading-relaxed">
+                At Dolce Fiore, sustainability isn't an afterthought—it's woven into every 
+                decision we make. We believe that premium gifting can and should be kind to 
+                the planet, creating beautiful moments without leaving a heavy footprint.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Dolce Fiore Story */}

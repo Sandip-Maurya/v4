@@ -40,3 +40,15 @@ export function useRemoveFromCart() {
   })
 }
 
+export function useUpdateCartQuantity() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
+      cartApi.updateCartQuantity(itemId, quantity),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: cartKeys.current() })
+    },
+  })
+}
+

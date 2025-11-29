@@ -5,6 +5,7 @@ import { ProductsPage } from '../features/products/ProductsPage'
 import { ProductDetailPage } from '../features/products/ProductDetailPage'
 import { CartPage } from '../features/cart/CartPage'
 import { CheckoutPage } from '../features/checkout/CheckoutPage'
+import { OrderConfirmationPage } from '../features/checkout/OrderConfirmationPage'
 import { OrdersPage } from '../features/orders/OrdersPage'
 import { LoginPage } from '../features/auth/LoginPage'
 import { SignupPage } from '../features/auth/SignupPage'
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
   {
     path: '/checkout',
     element: <MainLayout><CheckoutPage /></MainLayout>,
+  },
+  {
+    path: '/checkout/confirmation/:orderId',
+    element: <MainLayout><OrderConfirmationPage /></MainLayout>,
   },
   {
     path: '/orders',

@@ -2,13 +2,13 @@ import { Container } from '../../components/Container'
 import { SectionTitle } from '../../components/SectionTitle'
 import { Button } from '../../components/Button'
 import { Badge } from '../../components/Badge'
-import { useCart } from '../../lib/hooks/useCart'
-import { useRemoveFromCart } from '../../lib/hooks/useCart'
+import { useCart, useRemoveFromCart, useUpdateCartQuantity } from '../../lib/hooks/useCart'
 import { Link } from 'react-router-dom'
 
 export function CartPage() {
   const { data: cart, isLoading, error } = useCart()
   const removeFromCartMutation = useRemoveFromCart()
+  const updateCartQuantityMutation = useUpdateCartQuantity()
 
   if (isLoading) {
     return (
@@ -32,6 +32,22 @@ export function CartPage() {
 
   const handleRemoveItem = (itemId: string) => {
     removeFromCartMutation.mutate(itemId)
+  }
+
+  const handleUpdateQuantity = (itemId: string, newQuantity: number) => {
+    if (newQuantity <= 0) {
+      handleRemoveItem(itemId)
+      return
+    }
+    updateCartQuantityMutation.mutate({ itemId, quantity: newQuantity })
+  }
+
+  const handleIncrement = (itemId: string, currentQuantity: number) => {
+    handleUpdateQuantity(itemId, currentQuantity + 1)
+  }
+
+  const handleDecrement = (itemId: string, currentQuantity: number) => {
+    handleUpdateQuantity(itemId, currentQuantity - 1)
   }
 
   if (!cart || cart.items.length === 0) {
@@ -95,13 +111,36 @@ export function CartPage() {
                     <h3 className="text-xl font-heading text-charcoal-900 mb-2">
                       {item.product.name}
                     </h3>
-                    <p className="text-sm text-charcoal-600 mb-4">
-                      Quantity: {item.quantity}
-                    </p>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-charcoal-600">Quantity:</span>
+                        <div className="flex items-center border border-beige-300 rounded-lg overflow-hidden">
+                          <button
+                            onClick={() => handleDecrement(item.id, item.quantity)}
+                            disabled={updateCartQuantityMutation.isPending}
+                            className="px-3 py-1.5 text-charcoal-700 hover:bg-beige-100 active:bg-beige-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Decrease quantity"
+                          >
+                            −
+                          </button>
+                          <span className="px-4 py-1.5 text-charcoal-900 font-medium min-w-[3rem] text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => handleIncrement(item.id, item.quantity)}
+                            disabled={updateCartQuantityMutation.isPending}
+                            className="px-3 py-1.5 text-charcoal-700 hover:bg-beige-100 active:bg-beige-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            aria-label="Increase quantity"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
                       <span className="text-xl font-heading text-charcoal-900">
                         ₹{item.line_total.toLocaleString()}
                       </span>
+                    </div>
+                    <div className="flex justify-end">
                       <Button
                         variant="ghost"
                         onClick={() => handleRemoveItem(item.id)}

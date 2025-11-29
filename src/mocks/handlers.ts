@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { mockProducts } from './data/products'
-import { getMockCart, addToMockCart, removeFromMockCart, clearMockCart } from './data/cart'
+import { getMockCart, addToMockCart, removeFromMockCart, clearMockCart, updateMockCartQuantity } from './data/cart'
 import { getMockOrders, createMockOrder } from './data/orders'
 
 export const handlers = [
@@ -55,6 +55,29 @@ export const handlers = [
     const { id } = params
     removeFromMockCart(id as string)
     return HttpResponse.json({ success: true })
+  }),
+
+  http.put('/api/cart/:id', async ({ params, request }) => {
+    const { id } = params
+    const body = await request.json() as { quantity: number }
+    const { quantity } = body
+
+    if (!quantity || quantity <= 0) {
+      return HttpResponse.json(
+        { error: 'Quantity must be a positive number' },
+        { status: 400 }
+      )
+    }
+
+    try {
+      const cartItem = updateMockCartQuantity(id as string, quantity)
+      return HttpResponse.json(cartItem)
+    } catch (error) {
+      return HttpResponse.json(
+        { error: error instanceof Error ? error.message : 'Failed to update cart item' },
+        { status: 404 }
+      )
+    }
   }),
 
   // Orders endpoints

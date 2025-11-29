@@ -1,0 +1,300 @@
+DOLCE FIORE — FRONTEND PHASED DEVELOPMENT INSTRUCTIONS
+Premium E-Commerce • Frontend-First with Mock Backend
+
+======================================================================
+0. BRAND OVERVIEW (KEEP THIS CONTEXT IN ALL DESIGN DECISIONS)
+======================================================================
+Brand: Dolce Fiore
+
+Brand Description:
+"At Dolce Fiore, we create premium, handcrafted gift hampers rooted in health, sustainability, and conscious living. Every product is designed to delight while leaving a positive impact — on people and the planet. Dolce Fiore began as a homegrown venture with a simple dream — to craft thoughtful, sustainable gifting experiences. What started four years ago with a passion for healthy indulgence has grown into a celebration of creativity and conscious living. Our hampers feature organic, guilt-free treats, air-fried savories, and sugar-free chocolates, all wrapped in eco-friendly, reusable packaging. We proudly partner with local artisans across India, bringing tradition and sustainability into every creation."
+
+Design Personality:
+- Premium • Minimal • Elegant • Conscious • Artisanal
+- Soft neutral palette (warm beige, off-white, deep brown/charcoal, muted gold)
+- Sustainable textures (kraft paper, wood, marble, cotton, jute)
+- Premium photography with natural light and editorial vibe
+- Smooth, subtle animations (no flashiness)
+
+Target Audience:
+Premium, health-conscious, eco-aware customers and luxury gift buyers.
+
+======================================================================
+1. IMAGE HANDLING POLICY
+======================================================================
+Dolce Fiore is visually driven. Use high-quality images for both development
+and production-ready UI structures.
+
+For Development (Mock Data):
+- Use Unsplash (primary) or Pexels (secondary).
+- Only use premium, editorial-quality images (no cheap-looking photos).
+- Prefer:
+  - gourmet desserts
+  - artisanal sweets
+  - organic snacks
+  - eco-friendly packaging (cloth, kraft paper, wooden trays, jute, glass jars)
+  - warm, natural lighting
+  - rustic food styling
+
+Examples of search keywords:
+- “organic sweets”
+- “artisanal chocolate”
+- “healthy snacks”
+- “eco friendly packaging”
+- “gift hamper”
+- “gourmet desserts”
+- “rustic food photography”
+
+Image Storage Logic:
+- MOCK mode → API returns Unsplash URLs.
+- REAL backend → API returns CDN/public storage URLs (S3, Cloudflare R2, DO Spaces, etc.).
+
+IMPORTANT:
+The UI must NEVER care where the image comes from.
+It must always receive image URLs through the API and render them directly.
+
+Future Production Setup:
+- Store real images in object storage (S3, R2, Spaces).
+- Serve via CDN.
+- API returns URLs only.
+
+======================================================================
+2. PROJECT SETUP (PHASE 0)
+======================================================================
+Goal:
+Set up a clean React + TypeScript + Tailwind app with routing and structure.
+
+Tasks:
+1. Create project via Vite + React + TypeScript.
+2. Install TailwindCSS, React Router, Zustand (optional), TanStack Query.
+3. Set up folder structure something similar:
+
+   src/
+     app/             # root layout + router
+     components/      # shared UI
+     features/        # domain modules (catalog, cart, orders, auth)
+     lib/
+       api/           # API client + endpoints
+       config/
+     mocks/           # MSW handlers & sample JSON
+     assets/          # stock images
+     styles/
+
+4. Set up routes:
+   /                  Home
+   /products          Product listing
+   /products/:slug    Product detail
+   /cart              Cart
+   /checkout          Checkout
+   /orders            My orders
+   /auth/login        Login
+   /auth/signup       Signup
+   /profile           Profile
+
+Done When:
+- App runs with empty placeholder pages.
+- Navigation works.
+
+======================================================================
+3. BRANDING & DESIGN SYSTEM (PHASE 1)
+======================================================================
+Goal:
+Establish the Dolce Fiore aesthetic and core UI components.
+
+Typography:
+- Use: Playfair Display (headings) + Inter (body)
+  → Premium, elegant, editorial, perfect for luxury gifting.
+
+Tailwind Theme:
+- Add brand colors, spacing scale, typography scale.
+
+Layout:
+- Implement MainLayout with premium Navbar + Footer.
+- Container component for centered, padded content.
+
+Shared Components:
+- Button (primary, secondary, ghost)
+- Card (product & content)
+- Badge (organic, eco-friendly, sugar-free)
+- SectionTitle
+- Modal (optional)
+
+Imagery placeholders:
+- Use Unsplash premium-quality temporary images.
+- Store them in /assets or reference them via URLs.
+
+Done When:
+- App visually resembles a premium brand shell.
+
+======================================================================
+4. DATA LAYER & MOCK API (PHASE 2)
+======================================================================
+Goal:
+Prepare architecture for future Django backend using TypeScript models,
+React Query, and MSW mock APIs.
+
+TypeScript Models:
+Product:
+- id, slug, name, description
+- price, currency="INR"
+- category ("COOKIE" | "SNACK" | "CAKE" | "SWEET" | "HAMPER")
+- images: string[]  (URLs only)
+- tags: string[]  ("organic", "guilt-free", "eco-friendly", "artisan")
+- is_available
+- weight_grams?
+
+CartItem:
+- id
+- product: Product
+- quantity
+- line_total
+
+Order:
+- id
+- items: CartItem[]
+- total
+- status ("PLACED" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED")
+- created_at
+
+API Client (lib/api/client.ts):
+- Wrapper around fetch/axios
+- Uses BASE_URL from env
+- get, post, etc.
+- Returns parsed JSON
+- No UI-level API calls
+
+Endpoints (lib/api/endpoints/*.ts):
+- catalog.ts → fetchProducts(), fetchProduct()
+- cart.ts → getCart(), addToCart(), removeFromCart()
+- orders.ts → getOrders(), placeOrder()
+- auth.ts → login(), logout()
+
+React Query:
+- Wrap app in QueryClientProvider
+- Hooks:
+  useProducts(), useProduct(), useCart(), useOrders()
+
+Mock Service Worker (MSW):
+Implement handlers:
+- GET    /api/products
+- GET    /api/products/:slug
+- GET    /api/cart
+- POST   /api/cart
+- DELETE /api/cart/:id
+- POST   /api/orders
+- GET    /api/orders
+- POST   /api/auth/login
+- POST   /api/auth/logout
+
+Mock Data:
+- Use UNSPLASH URLs for products & hampers.
+- Include luxury hamper photography.
+- Products should reflect Dolce Fiore values (organic, eco-friendly, guilt-free).
+
+Done When:
+- useProducts() fetches mock data from MSW.
+- All data flows are functional with no real backend.
+
+======================================================================
+5. CORE PAGES & SHOPPING FLOW (PHASE 3)
+======================================================================
+Goal:
+Implement full shopping experience using mock data.
+
+Pages and Requirements:
+
+1. Home (/):
+   - Hero image (premium, Unsplash).
+   - Featured Hampers.
+   - Healthy Treats.
+   - Eco-friendly gifting highlight.
+   - Dolce Fiore story section.
+
+2. Product Listing (/products):
+   - Grid of ProductCards.
+   - Filters: category, organic, sugar-free, eco-friendly.
+   - Sorting, pagination (optional).
+   - Mobile-first design.
+
+3. Product Detail (/products/:slug):
+   - Large gallery (Unsplash images).
+   - Price, tags, ingredients description.
+   - Sustainability note.
+   - Add to Cart button.
+   - Related products section.
+
+4. Cart (/cart):
+   - Cart item list with quantity update.
+   - Summary card.
+   - “Proceed to Checkout” button.
+
+5. Checkout (/checkout):
+   - Step 1: Customer details & address.
+   - Step 2: Delivery preferences + gift note (optional).
+   - Step 3: Payment placeholder (mock success).
+   - On success → placeOrder() → redirect.
+
+6. Order Confirmation:
+   - Clear thank-you message.
+   - Order summary.
+
+7. My Orders (/orders):
+   - List previous orders.
+   - Order status timeline.
+
+8. Auth pages:
+   - Simple mock login/signup to test flow.
+
+Done When:
+- User can browse → view product → add to cart → checkout → see confirmation.
+- All using mock data.
+
+======================================================================
+6. PREMIUM POLISH & BRAND DEPTH (PHASE 4)
+======================================================================
+Goal:
+Make the UI feel truly luxurious and brand-accurate.
+
+Tasks:
+- Replace any weak placeholders with premium Unsplash images.
+- Improve microcopy (handcrafted, organic, eco-friendly, guilt-free).
+- Add soft animations on hover, scroll, and transitions.
+- Validate accessibility: alt text, contrast, keyboard navigation.
+- Optimize images (sizes, lazy loading).
+
+Done When:
+- The app looks premium, handcrafted, and polished.
+
+======================================================================
+7. PREP FOR DJANGO BACKEND (PHASE 5)
+======================================================================
+Goal:
+Make frontend ready for real backend integration.
+
+Tasks:
+1. Ensure Django REST endpoints match:
+   - URLs
+   - JSON fields
+   - Types defined in frontend
+
+2. Switch VITE_API_BASE_URL to real backend.
+3. Disable MSW in production.
+4. Test all flows with real data.
+5. Django should return CDN URLs for images.
+
+Done When:
+- Frontend works with real backend without major code changes.
+
+======================================================================
+8. GLOBAL BEST PRACTICES (APPLY THROUGHOUT)
+======================================================================
+- NEVER call fetch/axios directly in components—only use API client.
+- Keep UI components presentational; put logic in hooks.
+- UI must never assume image source (Unsplash vs CDN); always use URLs from API.
+- Maintain strict file structure and naming consistency.
+- Design mobile-first.
+- Design mobile-first.
+- Keep brand aesthetic consistent everywhere.
+- Keep code modular and integration-friendly.
+
+END OF INSTRUCTIONS

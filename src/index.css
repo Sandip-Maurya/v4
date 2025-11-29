@@ -47,9 +47,29 @@
     font-family: var(--font-family-body);
     color: var(--color-charcoal-900);
     background-color: var(--color-beige-50);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-family-heading);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  h1 {
+    font-weight: 700;
+  }
+
+  h2 {
+    font-weight: 600;
+  }
+
+  h3, h4 {
+    font-weight: 500;
+  }
+
+  p {
+    line-height: 1.6;
   }
 }

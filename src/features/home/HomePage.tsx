@@ -1,9 +1,19 @@
 import { Container } from '../../components/Container'
 import { Button } from '../../components/Button'
 import { SectionTitle } from '../../components/SectionTitle'
+import { Card } from '../../components/Card'
+import { Badge } from '../../components/Badge'
 import { Link } from 'react-router-dom'
+import { useProducts } from '../../lib/hooks/useProducts'
 
 export function HomePage() {
+  const { data: products } = useProducts()
+  
+  // Filter products for different sections
+  const featuredHampers = products?.filter((p) => p.category === 'HAMPER').slice(0, 3) || []
+  const healthyIndulgences = products?.filter((p) => 
+    p.tags.includes('sugar-free') || p.tags.includes('guilt-free')
+  ).slice(0, 3) || []
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
@@ -50,7 +60,7 @@ export function HomePage() {
         </Container>
       </section>
 
-      {/* Featured Sections Placeholder */}
+      {/* Featured Hampers */}
       <Container>
         <div className="py-16 sm:py-24">
           <SectionTitle
@@ -58,9 +68,57 @@ export function HomePage() {
             subtitle="Curated collections of premium, sustainable treats"
             align="center"
           />
-          <p className="text-center text-charcoal-600 mb-12">
-            Discover our handcrafted selection coming soon...
-          </p>
+          {featuredHampers.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredHampers.map((product) => (
+                <Link key={product.id} to={`/products/${product.slug}`}>
+                  <Card
+                    imageUrl={product.images[0]}
+                    imageAlt={product.name}
+                    hoverable
+                    className="h-full flex flex-col"
+                  >
+                    <div className="flex-grow">
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {product.tags.slice(0, 2).map((tag) => (
+                          <Badge
+                            key={tag}
+                            label={tag}
+                            type={
+                              tag === 'organic'
+                                ? 'organic'
+                                : tag === 'eco-friendly'
+                                  ? 'eco-friendly'
+                                  : tag === 'sugar-free'
+                                    ? 'sugar-free'
+                                    : tag === 'artisan'
+                                      ? 'artisan'
+                                      : 'custom'
+                            }
+                          />
+                        ))}
+                      </div>
+                      <h3 className="text-xl font-heading text-charcoal-900 mb-2">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-charcoal-600 mb-4 line-clamp-2">
+                        {product.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-beige-200">
+                      <span className="text-2xl font-heading text-charcoal-900">
+                        ₹{product.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-charcoal-600 mb-12">
+              Discover our handcrafted selection coming soon...
+            </p>
+          )}
         </div>
 
         <div className="py-16 sm:py-24 bg-beige-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
@@ -69,9 +127,57 @@ export function HomePage() {
             subtitle="Sugar-free, organic, and guilt-free treats that delight"
             align="center"
           />
-          <p className="text-center text-charcoal-600 mb-12">
-            Our curated selection coming soon...
-          </p>
+          {healthyIndulgences.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {healthyIndulgences.map((product) => (
+                <Link key={product.id} to={`/products/${product.slug}`}>
+                  <Card
+                    imageUrl={product.images[0]}
+                    imageAlt={product.name}
+                    hoverable
+                    className="h-full flex flex-col"
+                  >
+                    <div className="flex-grow">
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {product.tags.slice(0, 2).map((tag) => (
+                          <Badge
+                            key={tag}
+                            label={tag}
+                            type={
+                              tag === 'organic'
+                                ? 'organic'
+                                : tag === 'eco-friendly'
+                                  ? 'eco-friendly'
+                                  : tag === 'sugar-free'
+                                    ? 'sugar-free'
+                                    : tag === 'artisan'
+                                      ? 'artisan'
+                                      : 'custom'
+                            }
+                          />
+                        ))}
+                      </div>
+                      <h3 className="text-xl font-heading text-charcoal-900 mb-2">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-charcoal-600 mb-4 line-clamp-2">
+                        {product.description}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-beige-200">
+                      <span className="text-2xl font-heading text-charcoal-900">
+                        ₹{product.price.toLocaleString()}
+                      </span>
+                    </div>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-charcoal-600 mb-12">
+              Our curated selection coming soon...
+            </p>
+          )}
         </div>
 
         <div className="py-16 sm:py-24">

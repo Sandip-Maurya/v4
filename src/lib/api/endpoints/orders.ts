@@ -1,5 +1,5 @@
 import { apiClient } from '../client'
-import { CartItem } from './cart'
+import type { CartItem } from './cart'
 
 export interface Order {
   id: string

@@ -6,7 +6,7 @@ export interface Product {
   name: string
   description: string
   price: number
-  currency: string
+  currency: 'INR'
   category: 'COOKIE' | 'SNACK' | 'CAKE' | 'SWEET' | 'HAMPER'
   images: string[]
   tags: string[]

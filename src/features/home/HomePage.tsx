@@ -1,10 +1,93 @@
 import { Container } from '../../components/Container'
 import { Button } from '../../components/Button'
 import { SectionTitle } from '../../components/SectionTitle'
-import { Card } from '../../components/Card'
 import { Badge } from '../../components/Badge'
 import { Link } from 'react-router-dom'
 import { useProducts } from '../../lib/hooks/useProducts'
+import { useAddToCart } from '../../lib/hooks/useCart'
+import type { Product } from '../../lib/api/endpoints/catalog'
+import toast from 'react-hot-toast'
+
+function ProductCard({ product }: { product: Product }) {
+  const addToCartMutation = useAddToCart()
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addToCartMutation.mutate(
+      { productId: product.id, quantity: 1 },
+      {
+        onSuccess: () => {
+          toast.success('Product added to cart!')
+        },
+      }
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 h-full flex flex-col">
+      <Link to={`/products/${product.slug}`} className="block">
+        <div className="aspect-square w-full overflow-hidden bg-beige-100">
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </Link>
+      <div className="p-4 sm:p-6 flex-grow flex flex-col">
+        <div className="flex-grow">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {product.tags.slice(0, 2).map((tag) => (
+              <Badge
+                key={tag}
+                label={tag}
+                type={
+                  tag === 'organic'
+                    ? 'organic'
+                    : tag === 'eco-friendly'
+                      ? 'eco-friendly'
+                      : tag === 'sugar-free'
+                        ? 'sugar-free'
+                        : tag === 'artisan'
+                          ? 'artisan'
+                          : 'custom'
+                }
+              />
+            ))}
+          </div>
+          <Link to={`/products/${product.slug}`} className="block">
+            <h3 className="text-xl font-heading text-charcoal-900 mb-2 hover:text-charcoal-700">
+              {product.name}
+            </h3>
+          </Link>
+          <p className="text-sm text-charcoal-600 mb-3 line-clamp-2">
+            {product.description}
+          </p>
+          <div className="text-sm text-charcoal-600 mb-4">
+            ₹{product.price.toLocaleString()}
+          </div>
+        </div>
+        <div className="flex gap-2 mt-auto pt-4 border-t border-beige-200">
+          <Link to={`/products/${product.slug}`} className="flex-1">
+            <Button variant="secondary" className="w-full text-sm px-4 py-2">
+              View Details
+            </Button>
+          </Link>
+          <Button
+            variant="primary"
+            className="flex-1 text-sm px-4 py-2"
+            onClick={handleAddToCart}
+            isLoading={addToCartMutation.isPending}
+            disabled={!product.is_available}
+          >
+            {product.is_available ? 'Add to Cart' : 'Out of Stock'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function HomePage() {
   const { data: products } = useProducts()
@@ -17,43 +100,77 @@ export function HomePage() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="relative w-full h-[70vh] sm:h-[80vh] lg:h-screen max-h-[900px] overflow-hidden">
+      <section className="relative w-full min-h-[500px] sm:min-h-[600px] lg:min-h-[700px] xl:min-h-[800px] mb-0 flex items-center">
         {/* Hero Image from Unsplash */}
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=1920&q=80&auto=format&fit=crop"
             alt="Premium artisanal gift hampers with organic treats"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
+            loading="eager"
           />
-          {/* Overlay for text readability */}
-          <div className="absolute inset-0 bg-charcoal-900 bg-opacity-30"></div>
+          {/* Sophisticated Multi-Layer Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-charcoal-900/20 via-charcoal-900/40 to-charcoal-900/70"></div>
+          {/* Vignette Effect */}
+          <div className="absolute inset-0 hero-vignette"></div>
+          {/* Additional depth layer */}
+          <div className="absolute inset-0 bg-gradient-to-t from-charcoal-900/60 via-transparent to-transparent"></div>
         </div>
 
         {/* Hero Content */}
         <Container>
-          <div className="relative h-full flex items-center justify-center text-center px-4">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-heading text-white mb-4 sm:mb-6 leading-tight">
-                Handcrafted, Sustainable,
-                <br />
-                <span className="text-gold-300">Guilt-Free Gifting</span>
-              </h1>
-              <p className="text-lg sm:text-xl lg:text-2xl text-beige-100 mb-8 sm:mb-10 leading-relaxed">
-                Premium gift hampers featuring organic, guilt-free treats, air-fried
-                savories, and sugar-free chocolates — all wrapped in eco-friendly,
-                reusable packaging.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/products">
-                  <Button variant="primary" className="w-full sm:w-auto">
+          <div className="relative py-8 sm:py-10 lg:py-12 xl:py-16 flex items-center justify-center text-center px-4 sm:px-6 w-full">
+            <div className="max-w-4xl w-full animate-in fade-in duration-1000 ease-out relative z-10">
+              {/* Decorative Top Accent Line */}
+              <div className="flex items-center justify-center mt-0 sm:mt-3 lg:mt-4 xl:mt-4 mb-3 sm:mb-4 lg:mb-6 xl:mb-8 opacity-60">
+                <div className="h-px w-16 bg-gold-300"></div>
+                <div className="mx-3 w-1.5 h-1.5 rounded-full bg-gold-300"></div>
+                <div className="h-px w-16 bg-gold-300"></div>
+              </div>
+
+              {/* Text Content with Backdrop Blur */}
+              <div className="backdrop-blur-sm bg-white/5 rounded-2xl p-5 sm:p-6 lg:p-8 xl:p-10 border border-white/10 shadow-2xl">
+                <h1 className="text-2xl sm:text-4xl lg:text-6xl xl:text-6xl font-heading text-white mb-3 sm:mb-4 lg:mb-5 xl:mb-6 leading-tight tracking-normal sm:tracking-wide lg:tracking-wider drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)] line-clamp-2">
+                  Handcrafted, Sustainable, <span className="text-gold-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">Guilt-Free Gifting</span>
+                </h1>
+                
+                {/* Decorative Divider */}
+                <div className="flex items-center justify-center my-3 sm:my-4 lg:my-5 xl:my-6">
+                  <div className="h-px w-24 bg-gold-300/50"></div>
+                </div>
+
+                <p className="text-sm sm:text-lg lg:text-xl xl:text-2xl text-beige-50 mb-4 sm:mb-6 lg:mb-8 xl:mb-10 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)] px-2 line-clamp-4">
+                  Premium gift hampers featuring organic, guilt-free treats, air-fried
+                  savories, and sugar-free chocolates — all wrapped in eco-friendly,
+                  reusable packaging.
+                </p>
+
+                {/* Buttons with Enhanced Styling */}
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 lg:gap-5 justify-center items-center relative z-20">
+                  <Link to="/products" className="w-full sm:w-auto group">
+                    <Button 
+                      variant="primary" 
+                      className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-charcoal-900 hover:bg-charcoal-800 border border-gold-300/20"
+                    >
                     Explore Hampers
                   </Button>
                 </Link>
-                <Link to="/products">
-                  <Button variant="secondary" className="w-full sm:w-auto bg-white/10 border-white/30 text-white hover:bg-white/20">
+                  <Link to="/products" className="w-full sm:w-auto group">
+                    <Button 
+                      variant="secondary" 
+                      className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base lg:text-lg font-medium bg-white/10 backdrop-blur-sm border-2 border-white/40 text-white hover:bg-white/20 hover:border-white/60 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
                     Learn More
                   </Button>
                 </Link>
+                </div>
+              </div>
+
+              {/* Decorative Bottom Accent Line */}
+              <div className="flex items-center justify-center mt-2 sm:mt-4 lg:mt-6 xl:mt-8 opacity-60">
+                <div className="h-px w-12 bg-gold-300"></div>
+                <div className="mx-2 w-1 h-1 rounded-full bg-gold-300"></div>
+                <div className="h-px w-12 bg-gold-300"></div>
               </div>
             </div>
           </div>
@@ -62,7 +179,7 @@ export function HomePage() {
 
       {/* Featured Hampers */}
       <Container>
-        <div className="py-16 sm:py-24">
+        <div className="pt-12 sm:pt-12 pb-4 sm:pb-4">
           <SectionTitle
             title="Featured Hampers"
             subtitle="Curated collections of premium, sustainable treats"
@@ -71,47 +188,7 @@ export function HomePage() {
           {featuredHampers.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredHampers.map((product) => (
-                <Link key={product.id} to={`/products/${product.slug}`}>
-                  <Card
-                    imageUrl={product.images[0]}
-                    imageAlt={product.name}
-                    hoverable
-                    className="h-full flex flex-col"
-                  >
-                    <div className="flex-grow">
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {product.tags.slice(0, 2).map((tag) => (
-                          <Badge
-                            key={tag}
-                            label={tag}
-                            type={
-                              tag === 'organic'
-                                ? 'organic'
-                                : tag === 'eco-friendly'
-                                  ? 'eco-friendly'
-                                  : tag === 'sugar-free'
-                                    ? 'sugar-free'
-                                    : tag === 'artisan'
-                                      ? 'artisan'
-                                      : 'custom'
-                            }
-                          />
-                        ))}
-                      </div>
-                      <h3 className="text-xl font-heading text-charcoal-900 mb-2">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-charcoal-600 mb-4 line-clamp-2">
-                        {product.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-beige-200">
-                      <span className="text-2xl font-heading text-charcoal-900">
-                        ₹{product.price.toLocaleString()}
-                      </span>
-                    </div>
-                  </Card>
-                </Link>
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
@@ -121,7 +198,7 @@ export function HomePage() {
           )}
         </div>
 
-        <div className="py-16 sm:py-24 bg-beige-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
+        <div className="pt-12 sm:pt-12 pb-4 sm:pb-4 bg-beige-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
           <SectionTitle
             title="Healthy Indulgences"
             subtitle="Sugar-free, organic, and guilt-free treats that delight"
@@ -130,47 +207,7 @@ export function HomePage() {
           {healthyIndulgences.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {healthyIndulgences.map((product) => (
-                <Link key={product.id} to={`/products/${product.slug}`}>
-                  <Card
-                    imageUrl={product.images[0]}
-                    imageAlt={product.name}
-                    hoverable
-                    className="h-full flex flex-col"
-                  >
-                    <div className="flex-grow">
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {product.tags.slice(0, 2).map((tag) => (
-                          <Badge
-                            key={tag}
-                            label={tag}
-                            type={
-                              tag === 'organic'
-                                ? 'organic'
-                                : tag === 'eco-friendly'
-                                  ? 'eco-friendly'
-                                  : tag === 'sugar-free'
-                                    ? 'sugar-free'
-                                    : tag === 'artisan'
-                                      ? 'artisan'
-                                      : 'custom'
-                            }
-                          />
-                        ))}
-                      </div>
-                      <h3 className="text-xl font-heading text-charcoal-900 mb-2">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-charcoal-600 mb-4 line-clamp-2">
-                        {product.description}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between mt-auto pt-4 border-t border-beige-200">
-                      <span className="text-2xl font-heading text-charcoal-900">
-                        ₹{product.price.toLocaleString()}
-                      </span>
-                    </div>
-                  </Card>
-                </Link>
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (
@@ -180,7 +217,7 @@ export function HomePage() {
           )}
         </div>
 
-        <div className="py-16 sm:py-24">
+        <div className="pt-12 sm:pt-12 pb-4 sm:pb-4">
           <SectionTitle
             title="Sustainable Gifting"
             subtitle="Eco-friendly packaging that's as thoughtful as our treats"
@@ -190,7 +227,7 @@ export function HomePage() {
             <div className="space-y-6">
               <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
                 <img
-                  src="https://images.unsplash.com/photo-1606312619070-d48b4bdc6e3c?w=800&q=80&auto=format&fit=crop"
+                  src="https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop"
                   alt="Eco-friendly kraft paper packaging with jute bags"
                   className="w-full h-full object-cover"
                 />
@@ -226,28 +263,32 @@ export function HomePage() {
               </div>
             </div>
           </div>
-          <div className="mt-12 bg-beige-50 rounded-xl p-8 lg:p-12">
-            <div className="max-w-3xl mx-auto text-center">
-              <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
-                Our Commitment
-              </h3>
-              <p className="text-lg text-charcoal-700 leading-relaxed">
-                At Dolce Fiore, sustainability isn't an afterthought—it's woven into every 
+        </div>
+
+        <div className="pt-12 sm:pt-12 pb-4 sm:pb-4 bg-beige-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 rounded-lg sm:rounded-none">
+          <SectionTitle
+            title="Our Commitment"
+            align="center"
+          />
+          <div className="max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg text-charcoal-700 leading-relaxed">
+            At Dolce Fiore, sustainability isn't an afterthought—it's woven into every 
                 decision we make. We believe that premium gifting can and should be kind to 
                 the planet, creating beautiful moments without leaving a heavy footprint.
-              </p>
-            </div>
+            </p>
+
           </div>
         </div>
 
+
         {/* Dolce Fiore Story */}
-        <div className="py-16 sm:py-24 bg-beige-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 rounded-lg sm:rounded-none">
+        <div className="pt-8 sm:pt-2 pb-12 sm:pb-12 bg-beige-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 rounded-lg sm:rounded-none">
           <SectionTitle
             title="Our Story"
             align="center"
           />
           <div className="max-w-3xl mx-auto">
-            <p className="text-base sm:text-lg text-charcoal-700 leading-relaxed mb-6">
+            <p className="text-base sm:text-lg text-charcoal-700 leading-relaxed mb-12">
               Dolce Fiore began as a homegrown venture with a simple dream — to craft
               thoughtful, sustainable gifting experiences. What started four years ago with
               a passion for healthy indulgence has grown into a celebration of creativity

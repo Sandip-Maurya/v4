@@ -252,7 +252,7 @@ export function FilterSidebar({
 
   // Desktop Sidebar
   return (
-    <aside className="hidden lg:block w-64 xl:w-72 flex-shrink-0 sticky top-4 h-fit">
+    <aside className="hidden lg:block w-64 flex-shrink-0 sticky top-4 h-fit">
       <div className="bg-white rounded-xl border border-beige-200 p-6 shadow-soft">
         {sidebarContent}
       </div>

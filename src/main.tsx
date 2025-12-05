@@ -19,7 +19,6 @@ async function enableMocking() {
     },
   })
   
-  console.log('✅ MSW: Mock Service Worker started successfully')
 }
 
 // Wait for MSW to be ready before rendering the app

@@ -7,6 +7,7 @@ import { SectionTitle } from '../../components/SectionTitle'
 import { useProduct, useProducts } from '../../lib/hooks/useProducts'
 import { useAddToCart } from '../../lib/hooks/useCart'
 import { useState, useMemo } from 'react'
+import toast from 'react-hot-toast'
 
 export function ProductDetailPage() {
   const { slug } = useParams()
@@ -51,7 +52,7 @@ export function ProductDetailPage() {
       { productId: product.id, quantity: 1 },
       {
         onSuccess: () => {
-          alert('Product added to cart!')
+          toast.success('Product added to cart!')
         },
       }
     )
@@ -70,24 +71,78 @@ export function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Product Images */}
           <div>
-            <div className="aspect-square w-full rounded-xl overflow-hidden bg-beige-100 mb-4">
+            <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-beige-100 mb-4 group">
               <img
                 src={product.images[selectedImageIndex] || product.images[0]}
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-opacity duration-300"
+                key={selectedImageIndex}
               />
+              {product.images.length > 1 && (
+                <>
+                  {/* Previous Button */}
+                  {selectedImageIndex > 0 && (
+                    <button
+                      onClick={() => setSelectedImageIndex(selectedImageIndex - 1)}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-charcoal-900 rounded-full p-2 shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                      aria-label="Previous image"
+                    >
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 19l-7-7 7-7"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                  {/* Next Button */}
+                  {selectedImageIndex < product.images.length - 1 && (
+                    <button
+                      onClick={() => setSelectedImageIndex(selectedImageIndex + 1)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-charcoal-900 rounded-full p-2 shadow-lg transition-all duration-200 opacity-0 group-hover:opacity-100"
+                      aria-label="Next image"
+                    >
+                      <svg
+                        className="w-6 h-6"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                  {/* Image Counter */}
+                  <div className="absolute bottom-4 right-4 bg-white/90 text-charcoal-900 text-sm px-3 py-1 rounded-full shadow-lg">
+                    {selectedImageIndex + 1} / {product.images.length}
+                  </div>
+                </>
+              )}
             </div>
             {product.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 max-h-32 overflow-y-auto">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImageIndex(index)}
-                    className={`aspect-square rounded-lg overflow-hidden border-2 ${
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                       selectedImageIndex === index
-                        ? 'border-charcoal-900'
-                        : 'border-beige-200'
+                        ? 'border-charcoal-900 ring-2 ring-charcoal-900 ring-offset-2'
+                        : 'border-beige-200 hover:border-charcoal-400'
                     }`}
+                    aria-label={`View image ${index + 1}`}
                   >
                     <img
                       src={image}

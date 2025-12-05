@@ -14,8 +14,10 @@ export const mockProducts: Product[] = [
     currency: 'INR',
     category: 'HAMPER',
     images: [
-      'https://images.unsplash.com/photo-1606312619070-d48b4bdc6e3c?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['organic', 'artisan', 'eco-friendly', 'guilt-free'],
     is_available: true,
@@ -33,6 +35,8 @@ export const mockProducts: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['sugar-free', 'organic', 'guilt-free', 'artisan'],
     is_available: true,
@@ -50,6 +54,7 @@ export const mockProducts: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['artisan', 'organic', 'eco-friendly'],
     is_available: true,
@@ -67,6 +72,8 @@ export const mockProducts: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['organic', 'guilt-free', 'eco-friendly', 'artisan'],
     is_available: true,
@@ -84,6 +91,8 @@ export const mockProducts: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['sugar-free', 'organic', 'artisan', 'guilt-free'],
     is_available: true,
@@ -100,7 +109,9 @@ export const mockProducts: Product[] = [
     category: 'HAMPER',
     images: [
       'https://images.unsplash.com/photo-1516975080664-ed2fc6a32937?w=800&q=80&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1606312619070-d48b4bdc6e3c?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['organic', 'eco-friendly', 'artisan', 'guilt-free'],
     is_available: true,
@@ -118,6 +129,8 @@ export const mockProducts: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['artisan', 'organic', 'guilt-free'],
     is_available: true,
@@ -135,6 +148,8 @@ export const mockProducts: Product[] = [
     images: [
       'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=800&q=80&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=800&q=80&auto=format&fit=crop',
     ],
     tags: ['organic', 'guilt-free', 'eco-friendly'],
     is_available: true,

@@ -1,16 +1,100 @@
 import { useState, useMemo, useEffect } from 'react'
 import { Container } from '../../components/Container'
 import { SectionTitle } from '../../components/SectionTitle'
-import { Card } from '../../components/Card'
 import { Badge } from '../../components/Badge'
 import { Button } from '../../components/Button'
 import { useProducts } from '../../lib/hooks/useProducts'
+import { useAddToCart } from '../../lib/hooks/useCart'
 import type { Product } from '../../lib/api/endpoints/catalog'
 import { Link } from 'react-router-dom'
 import { FilterSidebar } from '../../components/FilterSidebar'
 import { SortDropdown } from '../../components/SortDropdown'
+import toast from 'react-hot-toast'
 
 type SortOption = 'price-low' | 'price-high' | 'newest'
+
+function ProductCard({ product }: { product: Product }) {
+  const addToCartMutation = useAddToCart()
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addToCartMutation.mutate(
+      { productId: product.id, quantity: 1 },
+      {
+        onSuccess: () => {
+          toast.success('Product added to cart!')
+        },
+      }
+    )
+  }
+
+  return (
+    <div className="bg-white rounded-xl shadow-card overflow-hidden transition-all duration-300 hover:shadow-card-hover hover:-translate-y-1 h-full flex flex-col">
+      <Link to={`/products/${product.slug}`} className="block">
+        <div className="aspect-square w-full overflow-hidden bg-beige-100">
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </Link>
+      <div className="p-4 sm:p-6 flex-grow flex flex-col">
+        <div className="flex-grow">
+          <div className="flex flex-wrap gap-2 mb-3">
+            {product.tags.slice(0, 2).map((tag) => (
+              <Badge
+                key={tag}
+                label={tag}
+                type={
+                  tag === 'organic'
+                    ? 'organic'
+                    : tag === 'eco-friendly'
+                      ? 'eco-friendly'
+                      : tag === 'sugar-free'
+                        ? 'sugar-free'
+                        : tag === 'artisan'
+                          ? 'artisan'
+                          : 'custom'
+                }
+              />
+            ))}
+          </div>
+          <Link to={`/products/${product.slug}`} className="block">
+            <h3 className="text-xl font-heading text-charcoal-900 mb-2 hover:text-charcoal-700">
+              {product.name}
+            </h3>
+          </Link>
+          <p className="text-sm text-charcoal-600 mb-3 line-clamp-2">
+            {product.description}
+          </p>
+          <div className="text-sm text-charcoal-600 mb-4">
+            ₹{product.price.toLocaleString()}
+          </div>
+        </div>
+        <div className="flex gap-2 mt-auto pt-4 border-t border-beige-200">
+          <Link to={`/products/${product.slug}`} className="flex-1 min-w-0">
+            <Button variant="secondary" className="w-full text-sm px-3 sm:px-4 py-2 whitespace-nowrap">
+              <span className="hidden sm:inline">View Details</span>
+              <span className="sm:hidden">Details</span>
+            </Button>
+          </Link>
+          <Button
+            variant="primary"
+            className="flex-1 min-w-0 text-sm px-3 sm:px-4 py-2 whitespace-nowrap"
+            onClick={handleAddToCart}
+            isLoading={addToCartMutation.isPending}
+            disabled={!product.is_available}
+          >
+            <span className="hidden sm:inline">{product.is_available ? 'Add to Cart' : 'Out of Stock'}</span>
+            <span className="sm:hidden">{product.is_available ? 'Add' : 'Out'}</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function ProductsPage() {
   const { data: products, isLoading, error } = useProducts()
@@ -140,7 +224,7 @@ export function ProductsPage() {
             subtitle="Premium, handcrafted gift hampers and treats"
             align="center"
           />
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
             {[...Array(6)].map((_, i) => (
               <div
                 key={i}
@@ -322,52 +406,9 @@ export function ProductsPage() {
 
             {/* Product Grid */}
             {filteredAndSortedProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-6">
             {filteredAndSortedProducts.map((product) => (
-              <Link key={product.id} to={`/products/${product.slug}`}>
-                <Card
-                  imageUrl={product.images[0]}
-                  imageAlt={product.name}
-                  hoverable
-                  className="h-full flex flex-col"
-                >
-                  <div className="flex-grow">
-                    <div className="flex flex-wrap gap-2 mb-3">
-                      {product.tags.slice(0, 2).map((tag) => (
-                        <Badge
-                          key={tag}
-                          label={tag}
-                          type={
-                            tag === 'organic'
-                              ? 'organic'
-                              : tag === 'eco-friendly'
-                                ? 'eco-friendly'
-                                : tag === 'sugar-free'
-                                  ? 'sugar-free'
-                                  : tag === 'artisan'
-                                    ? 'artisan'
-                                    : 'custom'
-                          }
-                        />
-                      ))}
-                    </div>
-                    <h3 className="text-xl font-heading text-charcoal-900 mb-2">
-                      {product.name}
-                    </h3>
-                    <p className="text-sm text-charcoal-600 mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-beige-200">
-                    <span className="text-2xl font-heading text-charcoal-900">
-                      ₹{product.price.toLocaleString()}
-                    </span>
-                    <Button variant="primary" className="text-sm px-4 py-2">
-                      View Details
-                    </Button>
-                  </div>
-                </Card>
-              </Link>
+              <ProductCard key={product.id} product={product} />
               ))}
             </div>
           ) : (

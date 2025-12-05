@@ -94,7 +94,7 @@ coverage/
 # ---------------------------------------------------
 # MSW mock worker build files (safe to ignore)
 # ---------------------------------------------------
-public/mockServiceWorker.js
+# public/mockServiceWorker.js
 
 # ---------------------------------------------------
 # Project specific (safe ignores)

@@ -436,8 +436,8 @@ Content-Type: application/json
     }
   ],
   "customerDetails": {
-    "name": "John Doe",
-    "email": "john@example.com",
+    "name": "Sandip Maurya",
+    "email": "sandip@example.com",
     "phone": "+91 1234567890"
   },
   "shippingAddress": {
@@ -462,7 +462,7 @@ POST /api/auth/login
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
+  "email": "sandip@example.com",
   "password": "password123"
 }
 ```
@@ -471,7 +471,7 @@ Content-Type: application/json
 ```json
 {
   "id": "user-1",
-  "email": "user@example.com",
+  "email": "sandip@example.com",
   "name": "User"
 }
 ```
@@ -482,7 +482,7 @@ POST /api/auth/signup
 Content-Type: application/json
 
 {
-  "email": "user@example.com",
+  "email": "sandip@example.com",
   "password": "password123",
   "name": "John Doe"
 }

@@ -217,7 +217,7 @@ export const handlers = [
     // For mock purposes, we'll use a default email
     // In a real app, this would come from the authenticated session
     // For now, we'll try to get it from localStorage or use a default
-    let userEmail = 'user@example.com'
+    let userEmail = 'sandip@example.com'
     try {
       const userData = localStorage.getItem('mock_user')
       if (userData) {
@@ -252,7 +252,7 @@ export const handlers = [
     }
 
     // Get user email from localStorage or use default
-    let userEmail = 'user@example.com'
+    let userEmail = 'sandip@example.com'
     try {
       const userData = localStorage.getItem('mock_user')
       if (userData) {

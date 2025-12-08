@@ -126,7 +126,7 @@ export function LoginPage() {
                   className={`w-full px-4 py-2 rounded-lg border ${
                     errors.email ? 'border-red-500' : 'border-beige-300'
                   } focus:outline-none focus:ring-2 focus:ring-charcoal-500`}
-                  placeholder="you@example.com"
+                  placeholder="sandip@example.com"
                 />
                 {errors.email && (
                   <p className="text-sm text-red-600 mt-1">{errors.email}</p>

@@ -178,7 +178,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                 )}
               </Link>
 
-              {/* User Menu or Login Link */}
+              {/* User Menu or Login/Signup Links */}
               {user ? (
                 <div ref={userMenuRef} className="relative">
                   <button
@@ -223,16 +223,28 @@ export function MainLayout({ children }: MainLayoutProps) {
                   )}
                 </div>
               ) : (
-                <Link
-                  to="/auth/login"
-                  className={`text-sm lg:text-base font-medium transition-colors ${
-                    isActive('/auth/login')
-                      ? 'text-charcoal-900 border-b-2 border-charcoal-900'
-                      : 'text-charcoal-600 hover:text-charcoal-900'
-                  }`}
-                >
-                  Login / Signup
-                </Link>
+                <>
+                  <Link
+                    to="/auth/login"
+                    className={`text-sm lg:text-base font-medium transition-colors ${
+                      isActive('/auth/login')
+                        ? 'text-charcoal-900 border-b-2 border-charcoal-900'
+                        : 'text-charcoal-600 hover:text-charcoal-900'
+                    }`}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/auth/signup"
+                    className={`text-sm lg:text-base font-medium transition-colors ${
+                      isActive('/auth/signup')
+                        ? 'text-charcoal-900 border-b-2 border-charcoal-900'
+                        : 'text-charcoal-600 hover:text-charcoal-900'
+                    }`}
+                  >
+                    Signup
+                  </Link>
+                </>
               )}
             </div>
 
@@ -348,17 +360,30 @@ export function MainLayout({ children }: MainLayoutProps) {
                   </button>
                 </>
               ) : (
-                <Link
-                  to="/auth/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`text-base font-medium transition-colors py-2 ${
-                    isActive('/auth/login')
-                      ? 'text-charcoal-900 border-l-4 border-charcoal-900 pl-4'
-                      : 'text-charcoal-600 hover:text-charcoal-900 pl-4'
-                  }`}
-                >
-                  Login / Signup
-                </Link>
+                <>
+                  <Link
+                    to="/auth/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`text-base font-medium transition-colors py-2 ${
+                      isActive('/auth/login')
+                        ? 'text-charcoal-900 border-l-4 border-charcoal-900 pl-4'
+                        : 'text-charcoal-600 hover:text-charcoal-900 pl-4'
+                    }`}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/auth/signup"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`text-base font-medium transition-colors py-2 ${
+                      isActive('/auth/signup')
+                        ? 'text-charcoal-900 border-l-4 border-charcoal-900 pl-4'
+                        : 'text-charcoal-600 hover:text-charcoal-900 pl-4'
+                    }`}
+                  >
+                    Signup
+                  </Link>
+                </>
               )}
             </div>
           </div>

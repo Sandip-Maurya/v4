@@ -231,7 +231,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                       : 'text-charcoal-600 hover:text-charcoal-900'
                   }`}
                 >
-                  Login
+                  Login / Signup
                 </Link>
               )}
             </div>
@@ -357,7 +357,7 @@ export function MainLayout({ children }: MainLayoutProps) {
                       : 'text-charcoal-600 hover:text-charcoal-900 pl-4'
                   }`}
                 >
-                  Login
+                  Login / Signup
                 </Link>
               )}
             </div>

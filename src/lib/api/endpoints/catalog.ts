@@ -19,11 +19,12 @@ export interface ProductFilters {
   tag?: string
   search?: string
   sort?: 'newest' | 'price_low' | 'price_high'
+  [key: string]: string | number | boolean | undefined
 }
 
 export const catalogApi = {
   fetchProducts: (filters?: ProductFilters) => 
-    apiClient.get<Product[]>('/products/', filters),
+    apiClient.get<Product[]>('/products/', filters as Record<string, string | number | boolean | undefined>),
   fetchProduct: (slug: string) => apiClient.get<Product>(`/products/${slug}/`),
 }
 

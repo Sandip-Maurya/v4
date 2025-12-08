@@ -3,6 +3,7 @@ import { mockProducts } from './data/products'
 import { getMockCart, addToMockCart, removeFromMockCart, clearMockCart, updateMockCartQuantity } from './data/cart'
 import { getMockOrders, createMockOrder } from './data/orders'
 import { getMockProfile, updateMockProfile } from './data/profile'
+import { type Profile } from '../lib/api/endpoints/auth'
 
 export const handlers = [
   // Products endpoints
@@ -263,7 +264,8 @@ export const handlers = [
     }
 
     try {
-      const updatedProfile = updateMockProfile(userEmail, body)
+      // Cast to Partial<Profile> to handle partial shippingAddress updates
+      const updatedProfile = updateMockProfile(userEmail, body as Partial<Profile>)
       return HttpResponse.json(updatedProfile)
     } catch (error) {
       return HttpResponse.json(

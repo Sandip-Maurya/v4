@@ -16,22 +16,11 @@ const queryClient = new QueryClient({
         // Retry once for other errors
         return failureCount < 1
       },
-      onError: (error) => {
-        // Handle 401 errors globally
-        if (error instanceof ApiError && error.status === 401) {
-          // Only redirect if not already on auth pages
-          const currentPath = window.location.pathname
-          if (!currentPath.startsWith('/auth/')) {
-            // Clear any cached user data
-            queryClient.removeQueries({ queryKey: ['user'] })
-            // Navigate to login (we'll handle this via router)
-            window.location.href = '/auth/login'
-          }
-        }
-      },
+      // Note: onError was removed from queries in React Query v5
+      // Handle query errors in individual queries or use global error handler
     },
     mutations: {
-      onError: (error) => {
+      onError: (error: unknown) => {
         // Handle 401 errors in mutations
         if (error instanceof ApiError && error.status === 401) {
           const currentPath = window.location.pathname

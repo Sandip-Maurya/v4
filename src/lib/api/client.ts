@@ -4,13 +4,18 @@ import { config } from '../config/env'
  * Custom error class for API errors with status code and message
  */
 export class ApiError extends Error {
+  public status: number
+  public data?: unknown
+
   constructor(
     message: string,
-    public status: number,
-    public data?: unknown
+    status: number,
+    data?: unknown
   ) {
     super(message)
     this.name = 'ApiError'
+    this.status = status
+    this.data = data
   }
 }
 
@@ -34,7 +39,7 @@ function getCsrfToken(): string | null {
 async function fetchCsrfToken(baseUrl: string): Promise<string | null> {
   try {
     // Make a GET request to get the CSRF token cookie
-    const response = await fetch(`${baseUrl}/schema/`, {
+    await fetch(`${baseUrl}/schema/`, {
       method: 'GET',
       credentials: 'include',
     })
@@ -117,9 +122,9 @@ class ApiClient {
       this.csrfTokenPromise = null
     }
     
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Content-Type': 'application/json',
-      ...options.headers,
+      ...(options.headers as Record<string, string>),
     }
     
     // Add CSRF token if available and needed for POST/PUT/DELETE

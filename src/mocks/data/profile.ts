@@ -1,4 +1,4 @@
-import { type Profile } from '../../lib/api/endpoints/auth'
+import { type Profile, type ShippingAddress } from '../../lib/api/endpoints/auth'
 
 // In-memory profile storage for MSW (keyed by email)
 const profilesCache: Map<string, Profile> = new Map()
@@ -74,7 +74,7 @@ export function updateMockProfile(userEmail: string, updates: Partial<Profile>):
     shippingAddress: {
       ...currentProfile.shippingAddress,
       ...(updates.shippingAddress || {}),
-    },
+    } as ShippingAddress, // Type assertion since we're merging with required fields
   }
   
   profilesCache.set(userEmail, updatedProfile)

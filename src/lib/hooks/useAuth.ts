@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { authApi, type LoginCredentials, type SignupData, type User, type Profile, type UpdateProfileData } from '../api/endpoints/auth'
+import { authApi, type LoginCredentials, type SignupData, type User, type UpdateProfileData } from '../api/endpoints/auth'
 
 export const userKeys = {
   current: () => ['user'] as const,

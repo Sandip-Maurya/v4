@@ -4,6 +4,7 @@ import { Button } from '../../components/Button'
 import { Badge } from '../../components/Badge'
 import { useCart, useRemoveFromCart, useUpdateCartQuantity } from '../../lib/hooks/useCart'
 import { Link } from 'react-router-dom'
+import { ApiError } from '../../lib/api/client'
 
 export function CartPage() {
   const { data: cart, isLoading, error } = useCart()
@@ -21,10 +22,15 @@ export function CartPage() {
   }
 
   if (error) {
+    // Check if the error is due to authentication (401 or 403)
+    const isAuthError = error instanceof ApiError && (error.status === 401 || error.status === 403)
+    
     return (
       <Container>
         <div className="py-12">
-          <div className="text-center text-red-600">Error loading cart</div>
+          <div className="text-center text-red-600">
+            {isAuthError ? 'You are not logged in' : 'Error loading cart'}
+          </div>
         </div>
       </Container>
     )

@@ -4,20 +4,20 @@
  * In production: Use full URL from environment variable
  */
 function getApiBaseUrl(): string {
-  // Allow explicit override via environment variable (for production)
+  // allow explicit override via env variable (for production)
   if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL
+    return import.meta.env.VITE_API_BASE_URL;
   }
-  
-  // In development, use relative path so Vite proxy handles it
-  // This makes requests same-origin, so cookies work with SameSite='Lax'
+
+  // in development, use relative path so Vite proxy handles it
   if (import.meta.env.DEV) {
-    return '/api'
+    return '/api';
   }
-  
-  // Fallback for production (should use VITE_API_BASE_URL)
-  return 'http://127.0.0.1:8000/api'
+
+  // default for production: relative path behind nginx
+  return '/api';
 }
+
 
 export const config = {
   // In development: Uses Vite proxy (same-origin, cookies work)

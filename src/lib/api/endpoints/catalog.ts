@@ -14,8 +14,16 @@ export interface Product {
   weight_grams?: number
 }
 
+export interface ProductFilters {
+  category?: 'COOKIE' | 'SNACK' | 'CAKE' | 'SWEET' | 'HAMPER'
+  tag?: string
+  search?: string
+  sort?: 'newest' | 'price_low' | 'price_high'
+}
+
 export const catalogApi = {
-  fetchProducts: () => apiClient.get<Product[]>('/products'),
-  fetchProduct: (slug: string) => apiClient.get<Product>(`/products/${slug}`),
+  fetchProducts: (filters?: ProductFilters) => 
+    apiClient.get<Product[]>('/products/', filters),
+  fetchProduct: (slug: string) => apiClient.get<Product>(`/products/${slug}/`),
 }
 

@@ -2,10 +2,15 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './app/App.tsx'
+import { config } from './lib/config/env'
 
-// Initialize MSW in development mode only
+// Initialize MSW conditionally
 async function enableMocking() {
-  if (import.meta.env.MODE !== 'development') {
+  // Only enable MSW if:
+  // 1. In development mode AND
+  // 2. VITE_USE_MOCK_API is explicitly set to 'true'
+  // This allows testing with real backend by not setting the env var
+  if (import.meta.env.MODE !== 'development' || !config.useMockApi) {
     return
   }
 
@@ -19,6 +24,7 @@ async function enableMocking() {
     },
   })
   
+  console.log('MSW (Mock Service Worker) enabled. Set VITE_USE_MOCK_API=false to use real backend.')
 }
 
 // Wait for MSW to be ready before rendering the app

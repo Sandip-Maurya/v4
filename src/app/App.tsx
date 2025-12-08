@@ -1,13 +1,51 @@
 import { RouterProvider } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Toaster } from 'react-hot-toast'
+import { Toaster, toast } from 'react-hot-toast'
 import { router } from './router'
+import { ApiError } from '../lib/api/client'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: (failureCount, error) => {
+        // Don't retry on 401 (unauthorized) errors
+        if (error instanceof ApiError && error.status === 401) {
+          return false
+        }
+        // Retry once for other errors
+        return failureCount < 1
+      },
+      onError: (error) => {
+        // Handle 401 errors globally
+        if (error instanceof ApiError && error.status === 401) {
+          // Only redirect if not already on auth pages
+          const currentPath = window.location.pathname
+          if (!currentPath.startsWith('/auth/')) {
+            // Clear any cached user data
+            queryClient.removeQueries({ queryKey: ['user'] })
+            // Navigate to login (we'll handle this via router)
+            window.location.href = '/auth/login'
+          }
+        }
+      },
+    },
+    mutations: {
+      onError: (error) => {
+        // Handle 401 errors in mutations
+        if (error instanceof ApiError && error.status === 401) {
+          const currentPath = window.location.pathname
+          if (!currentPath.startsWith('/auth/')) {
+            queryClient.removeQueries({ queryKey: ['user'] })
+            window.location.href = '/auth/login'
+          }
+        } else if (error instanceof ApiError) {
+          // Show error toast for other API errors
+          toast.error(error.message || 'An error occurred')
+        } else if (error instanceof Error) {
+          toast.error(error.message || 'An error occurred')
+        }
+      },
     },
   },
 })

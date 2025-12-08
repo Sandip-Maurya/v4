@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { mockProducts } from './data/products'
 import { getMockCart, addToMockCart, removeFromMockCart, clearMockCart, updateMockCartQuantity } from './data/cart'
 import { getMockOrders, createMockOrder } from './data/orders'
+import { getMockProfile, updateMockProfile } from './data/profile'
 
 export const handlers = [
   // Products endpoints
@@ -164,6 +165,13 @@ export const handlers = [
       )
     }
 
+    // Store user in localStorage for profile access
+    try {
+      localStorage.setItem('mock_user', JSON.stringify({ email, id: 'user-1' }))
+    } catch {
+      // Ignore localStorage errors
+    }
+
     // Return mock user
     return HttpResponse.json({
       id: 'user-1',
@@ -187,12 +195,82 @@ export const handlers = [
       )
     }
 
+    // Store user in localStorage for profile access
+    const userId = `user-${Date.now()}`
+    try {
+      localStorage.setItem('mock_user', JSON.stringify({ email, id: userId }))
+    } catch {
+      // Ignore localStorage errors
+    }
+
     // Return mock user
     return HttpResponse.json({
-      id: `user-${Date.now()}`,
+      id: userId,
       email,
       name,
     }, { status: 201 })
+  }),
+
+  // Profile endpoints
+  http.get('/api/auth/profile', () => {
+    // For mock purposes, we'll use a default email
+    // In a real app, this would come from the authenticated session
+    // For now, we'll try to get it from localStorage or use a default
+    let userEmail = 'user@example.com'
+    try {
+      const userData = localStorage.getItem('mock_user')
+      if (userData) {
+        const user = JSON.parse(userData)
+        userEmail = user.email || userEmail
+      }
+    } catch {
+      // Use default
+    }
+
+    const profile = getMockProfile(userEmail)
+    if (!profile) {
+      return HttpResponse.json(
+        { error: 'Profile not found' },
+        { status: 404 }
+      )
+    }
+    return HttpResponse.json(profile)
+  }),
+
+  http.put('/api/auth/profile', async ({ request }) => {
+    const body = await request.json() as {
+      name?: string
+      phone?: string
+      shippingAddress?: {
+        street?: string
+        city?: string
+        state?: string
+        zipCode?: string
+        country?: string
+      }
+    }
+
+    // Get user email from localStorage or use default
+    let userEmail = 'user@example.com'
+    try {
+      const userData = localStorage.getItem('mock_user')
+      if (userData) {
+        const user = JSON.parse(userData)
+        userEmail = user.email || userEmail
+      }
+    } catch {
+      // Use default
+    }
+
+    try {
+      const updatedProfile = updateMockProfile(userEmail, body)
+      return HttpResponse.json(updatedProfile)
+    } catch (error) {
+      return HttpResponse.json(
+        { error: error instanceof Error ? error.message : 'Failed to update profile' },
+        { status: 400 }
+      )
+    }
   }),
 
   // Payments endpoint

@@ -9,7 +9,7 @@ export interface Payment {
 export interface PaymentOrderRequest {
   amount: number
   currency: string
-  orderId?: string
+  orderId: string
 }
 
 export interface PaymentOrderResponse {
@@ -21,6 +21,6 @@ export interface PaymentOrderResponse {
 
 export const paymentsApi = {
   createPaymentOrder: (data: PaymentOrderRequest) =>
-    apiClient.post<PaymentOrderResponse>('/payments/create-order', data),
+    apiClient.post<PaymentOrderResponse>('/payments/create-order/', data),
 }
 

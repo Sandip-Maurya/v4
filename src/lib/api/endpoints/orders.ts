@@ -10,8 +10,8 @@ export interface Order {
 }
 
 export const ordersApi = {
-  getOrders: () => apiClient.get<Order[]>('/orders'),
+  getOrders: () => apiClient.get<Order[]>('/orders/'),
   placeOrder: (orderData: unknown) =>
-    apiClient.post<Order>('/orders', orderData),
+    apiClient.post<Order>('/orders/', orderData),
 }
 

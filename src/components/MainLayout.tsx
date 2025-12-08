@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Container } from './Container'
 import { useCart } from '../lib/hooks/useCart'
+import { useUser, useLogout } from '../lib/hooks/useAuth'
 
 interface MainLayoutProps {
   children: ReactNode
@@ -9,11 +10,16 @@ interface MainLayoutProps {
 
 export function MainLayout({ children }: MainLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [newsletterEmail, setNewsletterEmail] = useState('')
   const location = useLocation()
+  const navigate = useNavigate()
   const menuRef = useRef<HTMLElement>(null)
+  const userMenuRef = useRef<HTMLDivElement>(null)
   const menuJustOpenedRef = useRef(false)
   const { data: cart } = useCart()
+  const { data: user } = useUser()
+  const logoutMutation = useLogout()
 
   // Calculate total cart item count from cart items
   const cartItemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0
@@ -90,6 +96,35 @@ export function MainLayout({ children }: MainLayoutProps) {
     }
   }, [isMobileMenuOpen])
 
+  // Close user menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isUserMenuOpen &&
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsUserMenuOpen(false)
+      }
+    }
+
+    if (isUserMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
+    }
+  }, [isUserMenuOpen])
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        setIsUserMenuOpen(false)
+        navigate('/')
+      },
+    })
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white border-b border-beige-200 sticky top-0 z-40">
@@ -143,17 +178,62 @@ export function MainLayout({ children }: MainLayoutProps) {
                 )}
               </Link>
 
-              {/* Login Link */}
-              <Link
-                to="/auth/login"
-                className={`text-sm lg:text-base font-medium transition-colors ${
-                  isActive('/auth/login')
-                    ? 'text-charcoal-900 border-b-2 border-charcoal-900'
-                    : 'text-charcoal-600 hover:text-charcoal-900'
-                }`}
-              >
-                Login
-              </Link>
+              {/* User Menu or Login Link */}
+              {user ? (
+                <div ref={userMenuRef} className="relative">
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-2 text-sm lg:text-base font-medium text-charcoal-600 hover:text-charcoal-900 transition-colors"
+                  >
+                    <span className="hidden sm:inline">{user.name || user.email}</span>
+                    <span className="sm:hidden">{user.name?.charAt(0) || user.email.charAt(0)}</span>
+                    <svg
+                      className={`w-4 h-4 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`}
+                      fill="none"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                  </button>
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-beige-200 py-2 z-50">
+                      <div className="px-4 py-2 border-b border-beige-200">
+                        <p className="text-sm font-medium text-charcoal-900">{user.name}</p>
+                        <p className="text-xs text-charcoal-600 truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-charcoal-700 hover:bg-beige-50 transition-colors"
+                      >
+                        Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        disabled={logoutMutation.isPending}
+                        className="w-full text-left px-4 py-2 text-sm text-charcoal-700 hover:bg-beige-50 transition-colors disabled:opacity-50"
+                      >
+                        {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  to="/auth/login"
+                  className={`text-sm lg:text-base font-medium transition-colors ${
+                    isActive('/auth/login')
+                      ? 'text-charcoal-900 border-b-2 border-charcoal-900'
+                      : 'text-charcoal-600 hover:text-charcoal-900'
+                  }`}
+                >
+                  Login
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -239,17 +319,47 @@ export function MainLayout({ children }: MainLayoutProps) {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                to="/auth/login"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`text-base font-medium transition-colors py-2 ${
-                  isActive('/auth/login')
-                    ? 'text-charcoal-900 border-l-4 border-charcoal-900 pl-4'
-                    : 'text-charcoal-600 hover:text-charcoal-900 pl-4'
-                }`}
-              >
-                Login
-              </Link>
+              {user ? (
+                <>
+                  <div className="px-4 py-2 border-t border-beige-200 mt-2 pt-4">
+                    <p className="text-sm font-medium text-charcoal-900">{user.name}</p>
+                    <p className="text-xs text-charcoal-600 truncate">{user.email}</p>
+                  </div>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`text-base font-medium transition-colors py-2 ${
+                      isActive('/profile')
+                        ? 'text-charcoal-900 border-l-4 border-charcoal-900 pl-4'
+                        : 'text-charcoal-600 hover:text-charcoal-900 pl-4'
+                    }`}
+                  >
+                    Profile
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout()
+                      setIsMobileMenuOpen(false)
+                    }}
+                    disabled={logoutMutation.isPending}
+                    className="w-full text-left text-base font-medium transition-colors py-2 text-charcoal-600 hover:text-charcoal-900 pl-4 disabled:opacity-50"
+                  >
+                    {logoutMutation.isPending ? 'Logging out...' : 'Logout'}
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/auth/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`text-base font-medium transition-colors py-2 ${
+                    isActive('/auth/login')
+                      ? 'text-charcoal-900 border-l-4 border-charcoal-900 pl-4'
+                      : 'text-charcoal-600 hover:text-charcoal-900 pl-4'
+                  }`}
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </Container>
@@ -257,7 +367,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
       <main className="flex-grow">{children}</main>
 
-      <footer className="bg-charcoal-900 text-beige-100 mt-auto relative">
+      <footer className="bg-charcoal-900 text-beige-100 mt-auto relative" tabIndex={-1}>
         <Container>
           {/* Decorative Top Accent Line */}
           <div className="flex items-center justify-center pt-12 sm:pt-16 pb-8 opacity-60">

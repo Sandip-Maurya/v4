@@ -14,12 +14,12 @@ export interface Cart {
 }
 
 export const cartApi = {
-  getCart: () => apiClient.get<Cart>('/cart'),
+  getCart: () => apiClient.get<Cart>('/cart/'),
   addToCart: (productId: string, quantity: number) =>
-    apiClient.post<CartItem>('/cart', { productId, quantity }),
+    apiClient.post<CartItem>('/cart/', { productId, quantity }),
   removeFromCart: (itemId: string) =>
-    apiClient.delete(`/cart/${itemId}`),
+    apiClient.delete(`/cart/${itemId}/delete/`),
   updateCartQuantity: (itemId: string, quantity: number) =>
-    apiClient.put<CartItem>(`/cart/${itemId}`, { quantity }),
+    apiClient.put<CartItem>(`/cart/${itemId}/`, { quantity }),
 }
 

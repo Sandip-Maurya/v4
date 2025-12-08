@@ -1,18 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
-import { catalogApi } from '../api/endpoints/catalog'
+import { catalogApi, type ProductFilters } from '../api/endpoints/catalog'
 
 export const productKeys = {
   all: ['products'] as const,
   lists: () => [...productKeys.all, 'list'] as const,
-  list: (filters?: string) => [...productKeys.lists(), { filters }] as const,
+  list: (filters?: ProductFilters) => [...productKeys.lists(), { filters }] as const,
   details: () => [...productKeys.all, 'detail'] as const,
   detail: (slug: string) => [...productKeys.details(), slug] as const,
 }
 
-export function useProducts() {
+export function useProducts(filters?: ProductFilters) {
   return useQuery({
-    queryKey: productKeys.lists(),
-    queryFn: () => catalogApi.fetchProducts(),
+    queryKey: productKeys.list(filters),
+    queryFn: () => catalogApi.fetchProducts(filters),
   })
 }
 

@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Container } from '../../components/Container'
 import { SectionTitle } from '../../components/SectionTitle'
 import { Button } from '../../components/Button'
 import { useCart } from '../../lib/hooks/useCart'
 import { usePlaceOrder, type PlaceOrderData } from '../../lib/hooks/useOrders'
+import { useUser, useProfile } from '../../lib/hooks/useAuth'
 import { PaymentSection } from './PaymentSection'
 
 type Step = 1 | 2 | 3
@@ -13,7 +14,11 @@ export function CheckoutPage() {
   const navigate = useNavigate()
   const { data: cart, isLoading: cartLoading } = useCart()
   const placeOrderMutation = usePlaceOrder()
+  const { data: user } = useUser()
+  const { data: profile } = useProfile()
   const [currentStep, setCurrentStep] = useState<Step>(1)
+  const [orderForSomeoneElse, setOrderForSomeoneElse] = useState(false)
+  const [createdOrderId, setCreatedOrderId] = useState<string | null>(null)
 
   // Form state
   const [customerDetails, setCustomerDetails] = useState({
@@ -34,6 +39,37 @@ export function CheckoutPage() {
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Navigate to confirmation when order is created and cart is cleared
+  useEffect(() => {
+    if (createdOrderId && (!cart || cart.items.length === 0)) {
+      // Small delay to ensure smooth transition
+      const timer = setTimeout(() => {
+        navigate(`/checkout/confirmation/${createdOrderId}`, { replace: true })
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [createdOrderId, cart, navigate])
+
+  // Pre-fill from profile when user is logged in and profile is loaded
+  useEffect(() => {
+    if (user && profile && !orderForSomeoneElse) {
+      setCustomerDetails({
+        name: profile.name || '',
+        email: profile.email || user.email || '',
+        phone: profile.phone || '',
+      })
+      if (profile.shippingAddress) {
+        setShippingAddress({
+          street: profile.shippingAddress.street || '',
+          city: profile.shippingAddress.city || '',
+          state: profile.shippingAddress.state || '',
+          zipCode: profile.shippingAddress.zipCode || '',
+          country: profile.shippingAddress.country || 'India',
+        })
+      }
+    }
+  }, [user, profile, orderForSomeoneElse])
 
   const validateStep1 = (): boolean => {
     const newErrors: Record<string, string> = {}
@@ -76,7 +112,37 @@ export function CheckoutPage() {
         setCurrentStep(2)
       }
     } else if (currentStep === 2) {
-      setCurrentStep(3)
+      // Create order before moving to payment step
+      if (!cart || cart.items.length === 0) {
+        return
+      }
+
+      const orderData: PlaceOrderData = {
+        items: cart.items.map((item) => ({
+          productId: item.product.id,
+          quantity: item.quantity,
+        })),
+        customerDetails,
+        shippingAddress: {
+          ...shippingAddress,
+          zipCode: shippingAddress.zipCode,
+        },
+        deliveryPreferences: {
+          giftNote: deliveryPreferences.giftNote || undefined,
+          deliveryDate: deliveryPreferences.deliveryDate || undefined,
+        },
+      }
+
+      placeOrderMutation.mutate(orderData, {
+        onSuccess: (order) => {
+          setCreatedOrderId(order.id)
+          setCurrentStep(3)
+        },
+        onError: (error) => {
+          console.error('Failed to create order:', error)
+          alert('Failed to create order. Please try again.')
+        },
+      })
     }
   }
 
@@ -87,35 +153,10 @@ export function CheckoutPage() {
   }
 
   const handlePlaceOrder = () => {
-    if (!cart || cart.items.length === 0) {
-      return
+    // Order is already created in step 2, just navigate to confirmation
+    if (createdOrderId) {
+      navigate(`/checkout/confirmation/${createdOrderId}`)
     }
-
-    const orderData: PlaceOrderData = {
-      items: cart.items.map((item) => ({
-        productId: item.product.id,
-        quantity: item.quantity,
-      })),
-      customerDetails,
-      shippingAddress: {
-        ...shippingAddress,
-        zipCode: shippingAddress.zipCode,
-      },
-      deliveryPreferences: {
-        giftNote: deliveryPreferences.giftNote || undefined,
-        deliveryDate: deliveryPreferences.deliveryDate || undefined,
-      },
-    }
-
-    placeOrderMutation.mutate(orderData, {
-      onSuccess: (order) => {
-        navigate(`/checkout/confirmation/${order.id}`)
-      },
-      onError: (error) => {
-        console.error('Failed to place order:', error)
-        alert('Failed to place order. Please try again.')
-      },
-    })
   }
 
   if (cartLoading) {
@@ -128,6 +169,38 @@ export function CheckoutPage() {
     )
   }
 
+  // If order is created and cart is empty, show redirecting state
+  if (createdOrderId && (!cart || cart.items.length === 0)) {
+    return (
+      <Container>
+        <div className="py-12">
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4 animate-pulse">
+              <svg
+                className="w-8 h-8 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-heading text-charcoal-900 mb-2">
+              Order Placed Successfully!
+            </h2>
+            <p className="text-charcoal-600 mb-4">Redirecting to order confirmation...</p>
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  // If cart is empty and no order created, show empty cart message
   if (!cart || cart.items.length === 0) {
     return (
       <Container>
@@ -193,7 +266,97 @@ export function CheckoutPage() {
                   Customer Details & Address
                 </h2>
 
-                <div className="space-y-4">
+                {/* Order for someone else checkbox - only show if user is logged in */}
+                {user && profile && (
+                  <div className="bg-beige-50 border border-beige-200 rounded-lg p-4 mb-6">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={orderForSomeoneElse}
+                        onChange={(e) => {
+                          setOrderForSomeoneElse(e.target.checked)
+                          // Clear form if unchecking
+                          if (!e.target.checked && profile) {
+                            setCustomerDetails({
+                              name: profile.name || '',
+                              email: profile.email || user.email || '',
+                              phone: profile.phone || '',
+                            })
+                            if (profile.shippingAddress) {
+                              setShippingAddress({
+                                street: profile.shippingAddress.street || '',
+                                city: profile.shippingAddress.city || '',
+                                state: profile.shippingAddress.state || '',
+                                zipCode: profile.shippingAddress.zipCode || '',
+                                country: profile.shippingAddress.country || 'India',
+                              })
+                            }
+                            setErrors({})
+                          }
+                        }}
+                        className="w-5 h-5 text-charcoal-900 border-beige-300 rounded focus:ring-2 focus:ring-charcoal-500"
+                      />
+                      <div>
+                        <span className="text-sm font-medium text-charcoal-900">
+                          Order for someone else
+                        </span>
+                        <p className="text-xs text-charcoal-600 mt-1">
+                          {orderForSomeoneElse
+                            ? 'Enter recipient details below'
+                            : 'Using your profile information'}
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                )}
+
+                {/* Show profile summary if not ordering for someone else and profile exists */}
+                {user && profile && !orderForSomeoneElse && (
+                  <div className="bg-beige-50 border border-beige-200 rounded-lg p-4 mb-6">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-charcoal-900 mb-2">
+                          Using your profile information
+                        </p>
+                        <div className="text-sm text-charcoal-700 space-y-1">
+                          <p>
+                            <span className="font-medium">Name:</span> {customerDetails.name}
+                          </p>
+                          <p>
+                            <span className="font-medium">Email:</span> {customerDetails.email}
+                          </p>
+                          {customerDetails.phone && (
+                            <p>
+                              <span className="font-medium">Phone:</span> {customerDetails.phone}
+                            </p>
+                          )}
+                          {shippingAddress.street && (
+                            <div className="mt-2 pt-2 border-t border-beige-300">
+                              <p className="font-medium mb-1">Shipping Address:</p>
+                              <p className="text-charcoal-600">
+                                {shippingAddress.street}
+                                <br />
+                                {shippingAddress.city}, {shippingAddress.state}{' '}
+                                {shippingAddress.zipCode}
+                                <br />
+                                {shippingAddress.country}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setOrderForSomeoneElse(true)}
+                        className="text-sm text-charcoal-600 hover:text-charcoal-900 underline"
+                      >
+                        Edit
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div className={`space-y-4 ${user && profile && !orderForSomeoneElse ? 'hidden' : ''}`}>
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-charcoal-700 mb-2">
                       Full Name *
@@ -225,9 +388,12 @@ export function CheckoutPage() {
                       onChange={(e) =>
                         setCustomerDetails({ ...customerDetails, email: e.target.value })
                       }
+                      disabled={user && !orderForSomeoneElse}
                       className={`w-full px-4 py-2 rounded-lg border ${
                         errors.email ? 'border-red-500' : 'border-beige-300'
-                      } focus:outline-none focus:ring-2 focus:ring-charcoal-500`}
+                      } focus:outline-none focus:ring-2 focus:ring-charcoal-500 ${
+                        user && !orderForSomeoneElse ? 'bg-beige-50 cursor-not-allowed' : ''
+                      }`}
                     />
                     {errors.email && (
                       <p className="text-sm text-red-600 mt-1">{errors.email}</p>
@@ -257,7 +423,7 @@ export function CheckoutPage() {
                     )}
                   </div>
 
-                  <div className="border-t border-beige-200 pt-6 mt-6">
+                  <div className={`border-t border-beige-200 pt-6 mt-6 ${user && profile && !orderForSomeoneElse ? 'hidden' : ''}`}>
                     <h3 className="text-lg font-heading text-charcoal-900 mb-4">
                       Shipping Address
                     </h3>
@@ -476,7 +642,17 @@ export function CheckoutPage() {
 
                   {/* Payment Section */}
                   <div>
-                    <PaymentSection amount={cart.total} currency="INR" />
+                    {createdOrderId ? (
+                      <PaymentSection 
+                        amount={cart.total} 
+                        currency="INR" 
+                        orderId={createdOrderId}
+                      />
+                    ) : (
+                      <div className="text-sm text-charcoal-600">
+                        Preparing payment...
+                      </div>
+                    )}
                   </div>
                 </div>
 

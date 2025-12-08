@@ -4,7 +4,7 @@ import { paymentsApi, type PaymentOrderResponse } from '../../lib/api/endpoints/
 interface PaymentSectionProps {
   amount: number
   currency?: string
-  orderId?: string
+  orderId: string
   onPaymentOrderCreated?: (paymentOrder: PaymentOrderResponse) => void
 }
 
@@ -19,7 +19,7 @@ export function PaymentSection({
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // Create payment order when component mounts or amount changes
+    // Create payment order when component mounts or amount/orderId changes
     const createPaymentOrder = async () => {
       setIsLoading(true)
       setError(null)
@@ -38,7 +38,7 @@ export function PaymentSection({
       }
     }
 
-    if (amount > 0) {
+    if (amount > 0 && orderId) {
       createPaymentOrder()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -4,6 +4,34 @@ import { Container } from '../../components/Container'
 import { SectionTitle } from '../../components/SectionTitle'
 import { Button } from '../../components/Button'
 import { useLogin } from '../../lib/hooks/useAuth'
+import { authApi, type Profile } from '../../lib/api/endpoints/auth'
+
+/**
+ * Check if a profile is fully complete.
+ * A profile is considered complete if it has:
+ * - Phone number
+ * - Complete shipping address (street, city, state, zipCode)
+ */
+function isProfileFullyComplete(profile: Profile): boolean {
+  // Check if phone is provided
+  if (!profile.phone || profile.phone.trim() === '') {
+    return false
+  }
+
+  // Check if shipping address is complete
+  const address = profile.shippingAddress
+  if (
+    !address ||
+    !address.street?.trim() ||
+    !address.city?.trim() ||
+    !address.state?.trim() ||
+    !address.zipCode?.trim()
+  ) {
+    return false
+  }
+
+  return true
+}
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -46,8 +74,16 @@ export function LoginPage() {
         password: formData.password,
       },
       {
-        onSuccess: () => {
-          navigate('/profile')
+        onSuccess: async () => {
+          // Check if profile is complete
+          try {
+            const profile = await authApi.getProfile()
+            const isProfileComplete = isProfileFullyComplete(profile)
+            navigate(isProfileComplete ? '/products' : '/profile')
+          } catch {
+            // If profile fetch fails, redirect to profile page
+            navigate('/profile')
+          }
         },
         onError: (error: unknown) => {
           const errorMessage =

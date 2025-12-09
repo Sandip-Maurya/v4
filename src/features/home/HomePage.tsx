@@ -5,6 +5,7 @@ import { Badge } from '../../components/Badge'
 import { Link } from 'react-router-dom'
 import { useProducts } from '../../lib/hooks/useProducts'
 import { useAddToCart } from '../../lib/hooks/useCart'
+import { useDynamicTextSize } from '../../lib/hooks/useDynamicTextSize'
 import type { Product } from '../../lib/api/endpoints/catalog'
 import toast from 'react-hot-toast'
 
@@ -69,19 +70,21 @@ function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
         <div className="flex gap-2 mt-auto pt-4 border-t border-beige-200">
-          <Link to={`/products/${product.slug}`} className="flex-1">
-            <Button variant="secondary" className="w-full text-sm px-4 py-2">
-              View Details
+          <Link to={`/products/${product.slug}`} className="flex-1 min-w-0">
+            <Button variant="secondary" className="w-full text-sm px-3 sm:px-4 py-2 whitespace-nowrap">
+              <span className="hidden sm:inline">View Details</span>
+              <span className="sm:hidden">Details</span>
             </Button>
           </Link>
           <Button
             variant="primary"
-            className="flex-1 text-sm px-4 py-2"
+            className="flex-1 min-w-0 text-sm px-3 sm:px-4 py-2 whitespace-nowrap"
             onClick={handleAddToCart}
             isLoading={addToCartMutation.isPending}
             disabled={!product.is_available}
           >
-            {product.is_available ? 'Add to Cart' : 'Out of Stock'}
+            <span className="hidden sm:inline">{product.is_available ? 'Add to Cart' : 'Out of Stock'}</span>
+            <span className="sm:hidden">{product.is_available ? 'Add' : 'Out'}</span>
           </Button>
         </div>
       </div>
@@ -91,6 +94,21 @@ function ProductCard({ product }: { product: Product }) {
 
 export function HomePage() {
   const { data: products } = useProducts()
+  
+  // Dynamic text sizing for hero section
+  const titleSize = useDynamicTextSize<HTMLHeadingElement>({
+    maxLines: 2,
+    minFontSize: 18,
+    maxFontSize: 72,
+    lineHeight: 1.2, // leading-tight
+  })
+  
+  const contentSize = useDynamicTextSize<HTMLParagraphElement>({
+    maxLines: 3,
+    minFontSize: 10,
+    maxFontSize: 32,
+    lineHeight: 1.6, // leading-relaxed but slightly tighter
+  })
   
   // Filter products for different sections
   const featuredHampers = products?.filter((p) => p.category === 'HAMPER').slice(0, 3) || []
@@ -130,7 +148,11 @@ export function HomePage() {
 
               {/* Text Content with Backdrop Blur */}
               <div className="backdrop-blur-sm bg-white/5 rounded-2xl p-5 sm:p-6 lg:p-8 xl:p-10 border border-white/10 shadow-2xl">
-                <h1 className="text-2xl sm:text-4xl lg:text-6xl xl:text-6xl font-heading text-white mb-3 sm:mb-4 lg:mb-5 xl:mb-6 leading-tight tracking-normal sm:tracking-wide lg:tracking-wider drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)] line-clamp-2">
+                <h1 
+                  ref={titleSize.ref}
+                  style={{ fontSize: titleSize.fontSize }}
+                  className="font-heading text-white mb-3 sm:mb-4 lg:mb-5 xl:mb-6 leading-tight tracking-normal sm:tracking-wide lg:tracking-wider drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+                >
                   Handcrafted, Sustainable, <span className="text-gold-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">Guilt-Free Gifting</span>
                 </h1>
                 
@@ -139,7 +161,11 @@ export function HomePage() {
                   <div className="h-px w-24 bg-gold-300/50"></div>
                 </div>
 
-                <p className="text-sm sm:text-lg lg:text-xl xl:text-2xl text-beige-50 mb-4 sm:mb-6 lg:mb-8 xl:mb-10 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)] px-2 line-clamp-4">
+                <p 
+                  ref={contentSize.ref}
+                  style={{ fontSize: contentSize.fontSize }}
+                  className="text-beige-50 mb-4 sm:mb-6 lg:mb-8 xl:mb-10 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)] px-2"
+                >
                   Premium gift hampers featuring organic, guilt-free treats, air-fried
                   savories, and sugar-free chocolates — all wrapped in eco-friendly,
                   reusable packaging.

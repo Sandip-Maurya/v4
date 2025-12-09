@@ -150,7 +150,14 @@ export function HomePage() {
               <div className="backdrop-blur-sm bg-white/5 rounded-2xl p-5 sm:p-6 lg:p-8 xl:p-10 border border-white/10 shadow-2xl">
                 <h1 
                   ref={titleSize.ref}
-                  style={{ fontSize: titleSize.fontSize }}
+                  style={{ 
+                    fontSize: titleSize.fontSize,
+                    overflow: 'visible',
+                    textOverflow: 'clip',
+                    display: 'block',
+                    WebkitLineClamp: 'none',
+                    WebkitBoxOrient: 'unset'
+                  } as React.CSSProperties}
                   className="font-heading text-white mb-3 sm:mb-4 lg:mb-5 xl:mb-6 leading-tight tracking-normal sm:tracking-wide lg:tracking-wider drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
                 >
                   Handcrafted, Sustainable, <span className="text-gold-300 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">Guilt-Free Gifting</span>
@@ -163,7 +170,14 @@ export function HomePage() {
 
                 <p 
                   ref={contentSize.ref}
-                  style={{ fontSize: contentSize.fontSize }}
+                  style={{ 
+                    fontSize: contentSize.fontSize,
+                    overflow: 'visible',
+                    textOverflow: 'clip',
+                    display: 'block',
+                    WebkitLineClamp: 'none',
+                    WebkitBoxOrient: 'unset'
+                  } as React.CSSProperties}
                   className="text-beige-50 mb-4 sm:mb-6 lg:mb-8 xl:mb-10 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)] px-2"
                 >
                   Premium gift hampers featuring organic, guilt-free treats, air-fried

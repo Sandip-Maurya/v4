@@ -21,19 +21,34 @@ export function useDynamicTextSize<T extends HTMLElement>(
     const calculateOptimalFontSize = () => {
       if (!element) return
 
+      // Ensure element has width - if not, skip calculation
+      if (element.offsetWidth === 0) return
+
       const container = element.parentElement
       if (!container) return
+      
+      // Ensure container has width
+      if (container.offsetWidth === 0) return
 
       // Store original styles
       const originalOverflow = getComputedStyle(element).overflow
       const originalWhiteSpace = getComputedStyle(element).whiteSpace
       const originalWordBreak = getComputedStyle(element).wordBreak
+      const originalTextOverflow = getComputedStyle(element).textOverflow
+      const originalDisplay = getComputedStyle(element).display
+      const originalMaxHeight = element.style.maxHeight
+      const originalWebkitLineClamp = (element.style as any).webkitLineClamp
+      const originalWebkitBoxOrient = (element.style as any).WebkitBoxOrient
 
       // Set temporary styles for measurement (no line-clamp, let it wrap naturally)
-      element.style.overflow = 'hidden'
+      element.style.overflow = 'hidden' // Hidden for measurement, will change later
       element.style.whiteSpace = 'normal'
       element.style.wordBreak = 'break-word'
       element.style.lineHeight = `${lineHeight}`
+      element.style.textOverflow = 'clip'
+      element.style.display = 'block'
+      ;(element.style as any).webkitLineClamp = 'none'
+      ;(element.style as any).WebkitBoxOrient = 'unset'
 
       // Binary search for optimal font size
       let low = minFontSize
@@ -50,7 +65,6 @@ export function useDynamicTextSize<T extends HTMLElement>(
         const scrollHeight = element.scrollHeight
         
         // More accurate line count calculation - use ceiling to be conservative
-        // Add small tolerance to account for rounding issues
         const lineCount = Math.ceil(scrollHeight / computedLineHeight)
         return lineCount
       }
@@ -85,10 +99,18 @@ export function useDynamicTextSize<T extends HTMLElement>(
         finalLineCount = getLineCount(bestSize)
       }
 
-      // Clean up temporary styles, restore original styles except fontSize
+      // Clean up temporary styles, but ensure NO truncation occurs
       element.style.whiteSpace = originalWhiteSpace
       element.style.wordBreak = originalWordBreak
-      element.style.overflow = originalOverflow
+      // Remove any max-height that might truncate content
+      element.style.maxHeight = originalMaxHeight || ''
+      // Set overflow to visible to prevent any text truncation
+      element.style.overflow = 'visible'
+      element.style.textOverflow = 'clip'
+      element.style.display = originalDisplay
+      // Remove any line-clamp styles that could cause truncation
+      ;(element.style as any).webkitLineClamp = 'none'
+      ;(element.style as any).WebkitBoxOrient = 'unset'
       // Keep the calculated line height for consistent rendering with our calculation
       element.style.lineHeight = `${lineHeight}`
 
@@ -105,9 +127,15 @@ export function useDynamicTextSize<T extends HTMLElement>(
       resizeTimeout = setTimeout(calculateOptimalFontSize, 50)
     }
 
-    // Small delay to ensure DOM is fully rendered
+    // Wait for DOM to be fully rendered and element to have dimensions
     const initialTimeout = setTimeout(() => {
-      calculateOptimalFontSize()
+      // Double-check element exists and has width before calculating
+      if (element && element.offsetWidth > 0) {
+        calculateOptimalFontSize()
+      } else {
+        // If not ready, wait a bit more
+        setTimeout(calculateOptimalFontSize, 100)
+      }
     }, 0)
 
     // Create ResizeObserver to watch for container size changes

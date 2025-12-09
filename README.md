@@ -56,7 +56,7 @@ Premium, health-conscious, eco-aware customers and luxury gift buyers who value 
 - **Hero Section** — Premium hero image with brand tagline and call-to-action buttons
 - **Featured Hampers** — Curated showcase of premium gift hampers
 - **Healthy Indulgences** — Sugar-free and guilt-free product highlights
-- **Sustainable Gifting** — Information about eco-friendly packaging and materials
+- **Sustainable Gifting** — Dynamic content section with images, titles, and descriptions loaded from backend API
 - **Brand Story** — Narrative about Dolce Fiore's journey and values
 
 #### 🛍️ Product Catalog
@@ -190,6 +190,7 @@ dolce-v4/
 │   │   │       ├── auth.ts
 │   │   │       ├── cart.ts
 │   │   │       ├── catalog.ts
+│   │   │       ├── content.ts
 │   │   │       ├── orders.ts
 │   │   │       └── payments.ts
 │   │   ├── config/        # Configuration files
@@ -198,7 +199,8 @@ dolce-v4/
 │   │       ├── useAuth.ts
 │   │       ├── useCart.ts
 │   │       ├── useOrders.ts
-│   │       └── useProducts.ts
+│   │       ├── useProducts.ts
+│   │       └── useSustainableGifting.ts
 │   ├── mocks/             # Mock data and API handlers
 │   │   ├── browser.ts     # MSW browser setup
 │   │   ├── handlers.ts    # API request handlers
@@ -516,6 +518,37 @@ Content-Type: application/json
   "currency": "INR"
 }
 ```
+
+### Content
+
+#### Get Sustainable Gifting Items
+```http
+GET /api/content/sustainable-gifting/
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "title": "Reusable Materials",
+    "description": "Every hamper is thoughtfully wrapped...",
+    "image_url": "https://images.unsplash.com/...",
+    "order": 0,
+    "is_active": true
+  },
+  {
+    "id": "uuid",
+    "title": "Conscious Living",
+    "description": "We partner with local artisans...",
+    "image_url": "https://images.unsplash.com/...",
+    "order": 1,
+    "is_active": true
+  }
+]
+```
+
+This endpoint returns active sustainable gifting items ordered by their `order` field. The frontend uses this data to dynamically display the Sustainable Gifting section on the home page.
 
 ## Future Plans & Improvements
 

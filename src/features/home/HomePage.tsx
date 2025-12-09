@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { useProducts } from '../../lib/hooks/useProducts'
 import { useAddToCart } from '../../lib/hooks/useCart'
 import { useDynamicTextSize } from '../../lib/hooks/useDynamicTextSize'
+import { useSustainableGifting } from '../../lib/hooks/useSustainableGifting'
 import type { Product } from '../../lib/api/endpoints/catalog'
 import toast from 'react-hot-toast'
 
@@ -94,6 +95,7 @@ function ProductCard({ product }: { product: Product }) {
 
 export function HomePage() {
   const { data: products } = useProducts()
+  const { data: sustainableGiftingItems, isLoading: isLoadingSustainableGifting, isError: isErrorSustainableGifting } = useSustainableGifting()
   
   // Dynamic text sizing for hero section
   const titleSize = useDynamicTextSize<HTMLHeadingElement>({
@@ -263,46 +265,86 @@ export function HomePage() {
             subtitle="Eco-friendly packaging that's as thoughtful as our treats"
             align="center"
           />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-12">
-            <div className="space-y-6">
-              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
-                <img
-                  src="https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop"
-                  alt="Eco-friendly kraft paper packaging with jute bags"
-                  className="w-full h-full object-cover"
-                />
+          {isLoadingSustainableGifting ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-12">
+              {[1, 2].map((i) => (
+                <div key={i} className="space-y-6">
+                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100 animate-pulse"></div>
+                  <div>
+                    <div className="h-7 bg-beige-200 rounded mb-4 w-3/4 animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-beige-200 rounded animate-pulse"></div>
+                      <div className="h-4 bg-beige-200 rounded w-5/6 animate-pulse"></div>
+                      <div className="h-4 bg-beige-200 rounded w-4/6 animate-pulse"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : isErrorSustainableGifting || !sustainableGiftingItems || sustainableGiftingItems.length === 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-12">
+              <div className="space-y-6">
+                <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=800&q=80&auto=format&fit=crop"
+                    alt="Eco-friendly kraft paper packaging with jute bags"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
+                    Reusable Materials
+                  </h3>
+                  <p className="text-charcoal-700 leading-relaxed">
+                    Every hamper is thoughtfully wrapped in reusable kraft paper, jute bags, and 
+                    glass containers. These materials aren't just packaging—they're part of the 
+                    gift, designed to be used again and again in your home.
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
-                  Reusable Materials
-                </h3>
-                <p className="text-charcoal-700 leading-relaxed">
-                  Every hamper is thoughtfully wrapped in reusable kraft paper, jute bags, and 
-                  glass containers. These materials aren't just packaging—they're part of the 
-                  gift, designed to be used again and again in your home.
-                </p>
+              <div className="space-y-6">
+                <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80&auto=format&fit=crop"
+                    alt="Wooden trays and natural materials for sustainable packaging"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
+                    Conscious Living
+                  </h3>
+                  <p className="text-charcoal-700 leading-relaxed">
+                    We partner with local artisans who share our commitment to sustainability. 
+                    From wooden trays to cotton wraps, every element is chosen for its minimal 
+                    environmental impact and maximum beauty.
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="space-y-6">
-              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
-                <img
-                  src="https://images.unsplash.com/photo-1511381939415-e44015466834?w=800&q=80&auto=format&fit=crop"
-                  alt="Wooden trays and natural materials for sustainable packaging"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div>
-                <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
-                  Conscious Living
-                </h3>
-                <p className="text-charcoal-700 leading-relaxed">
-                  We partner with local artisans who share our commitment to sustainability. 
-                  From wooden trays to cotton wraps, every element is chosen for its minimal 
-                  environmental impact and maximum beauty.
-                </p>
-              </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 mt-12">
+              {sustainableGiftingItems.map((item) => (
+                <div key={item.id} className="space-y-6">
+                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-beige-100">
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-heading text-charcoal-900 mb-4">
+                      {item.title}
+                    </h3>
+                    <p className="text-charcoal-700 leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          )}
         </div>
 
         <div className="pt-12 sm:pt-12 pb-4 sm:pb-4 bg-beige-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 rounded-lg sm:rounded-none">

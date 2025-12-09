@@ -31,14 +31,10 @@ export function useDynamicTextSize<T extends HTMLElement>(
       if (container.offsetWidth === 0) return
 
       // Store original styles
-      const originalOverflow = getComputedStyle(element).overflow
       const originalWhiteSpace = getComputedStyle(element).whiteSpace
       const originalWordBreak = getComputedStyle(element).wordBreak
-      const originalTextOverflow = getComputedStyle(element).textOverflow
       const originalDisplay = getComputedStyle(element).display
       const originalMaxHeight = element.style.maxHeight
-      const originalWebkitLineClamp = (element.style as any).webkitLineClamp
-      const originalWebkitBoxOrient = (element.style as any).WebkitBoxOrient
 
       // Set temporary styles for measurement (no line-clamp, let it wrap naturally)
       element.style.overflow = 'hidden' // Hidden for measurement, will change later

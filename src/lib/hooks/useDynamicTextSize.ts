@@ -9,9 +9,9 @@ interface UseDynamicTextSizeOptions {
 
 export function useDynamicTextSize<T extends HTMLElement>(
   options: UseDynamicTextSizeOptions
-): { ref: RefObject<T>; fontSize: string } {
+): { ref: RefObject<T | null>; fontSize: string } {
   const { maxLines, minFontSize = 12, maxFontSize = 72, lineHeight = 1.5 } = options
-  const ref = useRef<T>(null)
+  const ref = useRef<T | null>(null)
   const [fontSize, setFontSize] = useState<string>('')
 
   useEffect(() => {
@@ -25,8 +25,6 @@ export function useDynamicTextSize<T extends HTMLElement>(
       if (!container) return
 
       // Store original styles
-      const originalFontSize = getComputedStyle(element).fontSize
-      const originalLineHeight = getComputedStyle(element).lineHeight
       const originalOverflow = getComputedStyle(element).overflow
       const originalWhiteSpace = getComputedStyle(element).whiteSpace
       const originalWordBreak = getComputedStyle(element).wordBreak

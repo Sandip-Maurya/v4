@@ -413,7 +413,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             {/* Newsletter Section */}
             <div className="mb-12 sm:mb-16 lg:mb-20">
               <div className="max-w-2xl mx-auto">
-                <div className="backdrop-blur-sm bg-charcoal-800/50 rounded-2xl p-6 sm:p-8 lg:p-10 border border-gold-300/20 shadow-2xl">
+                <div className="backdrop-blur-sm bg-charcoal-800/50 rounded-2xl p-6 sm:p-8 lg:p-10 border border-gold-300/20 shadow-2xl relative z-10">
                   <div className="text-center mb-6">
                     <h3 className="text-2xl sm:text-3xl lg:text-4xl font-heading mb-3 text-beige-50">
                       Stay Connected
@@ -429,14 +429,14 @@ export function MainLayout({ children }: MainLayoutProps) {
                       // Newsletter subscription logic would go here
                       setNewsletterEmail('')
                     }}
-                    className="flex flex-col sm:flex-row gap-3"
+                    className="flex flex-col sm:flex-row gap-3 relative z-10"
                   >
                     <input
                       type="email"
                       value={newsletterEmail}
                       onChange={(e) => setNewsletterEmail(e.target.value)}
                       placeholder="Enter your email address"
-                      className="flex-1 px-4 py-3 rounded-lg bg-charcoal-900/50 border border-beige-300/20 text-beige-100 placeholder-beige-400 focus:outline-none focus:ring-2 focus:ring-gold-300/50 focus:border-gold-300/50 transition-all"
+                      className="flex-1 px-4 py-3 rounded-lg bg-charcoal-900/50 border border-beige-300/20 text-beige-100 placeholder-beige-400 focus:outline-none focus:ring-2 focus:ring-gold-300/50 focus:border-gold-300/50 transition-all relative z-10"
                       required
                     />
                     <button
@@ -451,7 +451,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             </div>
 
             {/* Main Footer Content */}
-            <div className="grid gap-3 sm:gap-4 md:gap-6 lg:gap-10 xl:gap-12 mb-12" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+            <div className="flex flex-row justify-center md:justify-around items-start gap-3 sm:gap-6 md:gap-12 lg:gap-16 mb-12 max-w-5xl mx-auto">
               {/* Quick Links */}
               <div className="text-left min-w-0">
                 <h4 className="text-sm sm:text-base md:text-lg font-heading mb-3 sm:mb-4 md:mb-5 text-beige-50">Quick Links</h4>
@@ -485,7 +485,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               </div>
 
               {/* Company Links */}
-              <div className="text-left min-w-0 flex-1">
+              <div className="text-left min-w-0">
                 <h4 className="text-sm sm:text-base md:text-lg font-heading mb-3 sm:mb-4 md:mb-5 text-beige-50">Company</h4>
                 <div className="h-px w-6 sm:w-8 bg-gold-300/30 mb-3 sm:mb-4"></div>
                 <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
@@ -611,7 +611,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
             {/* Footer Bottom */}
             <div className="pt-8 border-t border-charcoal-800">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="flex flex-col md:flex-row justify-evenly items-center gap-4 sm:gap-6">
                 <p className="text-sm text-beige-400">
                   © {new Date().getFullYear()} Dolce Fiore. All rights reserved.
                 </p>

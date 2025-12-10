@@ -4,6 +4,7 @@ import { Badge } from '../../components/Badge'
 import { Button } from '../../components/Button'
 import { Card } from '../../components/Card'
 import { SectionTitle } from '../../components/SectionTitle'
+import { SkeletonLoader, SkeletonCard } from '../../components/SkeletonLoader'
 import { useProduct, useProducts } from '../../lib/hooks/useProducts'
 import { useAddToCart } from '../../lib/hooks/useCart'
 import { useState, useMemo } from 'react'
@@ -28,7 +29,38 @@ export function ProductDetailPage() {
     return (
       <Container>
         <div className="py-12">
-          <div className="text-center text-charcoal-600">Loading product...</div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+            {/* Product Image Skeleton */}
+            <div>
+              <div className="aspect-square w-full rounded-xl overflow-hidden bg-beige-100 mb-4">
+                <SkeletonLoader type="image" className="w-full h-full" />
+              </div>
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="aspect-square rounded-lg overflow-hidden">
+                    <SkeletonLoader type="image" className="w-full h-full" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Product Info Skeleton */}
+            <div>
+              <div className="flex gap-2 mb-4">
+                <SkeletonLoader type="text" width={80} height={24} className="rounded" />
+                <SkeletonLoader type="text" width={100} height={24} className="rounded" />
+              </div>
+              <SkeletonLoader type="text" width="80%" height={48} className="rounded mb-4" />
+              <SkeletonLoader type="text" width={120} height={36} className="rounded mb-6" />
+              <div className="space-y-3 mb-8">
+                <SkeletonLoader type="text" width="100%" height={20} className="rounded" />
+                <SkeletonLoader type="text" width="95%" height={20} className="rounded" />
+                <SkeletonLoader type="text" width="90%" height={20} className="rounded" />
+              </div>
+              <SkeletonLoader type="text" width={100} height={20} className="rounded mb-6" />
+              <SkeletonLoader type="text" width="100%" height={48} className="rounded" />
+            </div>
+          </div>
         </div>
       </Container>
     )

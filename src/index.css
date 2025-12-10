@@ -99,4 +99,25 @@
   .fade-in {
     animation: fadeIn 1s ease-out;
   }
+  
+  /* Shimmer animation for skeleton loaders */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+  
+  .shimmer {
+    background: linear-gradient(
+      to right,
+      #f5f3f0 0%,
+      #e8e4dd 50%,
+      #f5f3f0 100%
+    );
+    background-size: 1000px 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
 }

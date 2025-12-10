@@ -2,6 +2,7 @@ import { Container } from '../../components/Container'
 import { Button } from '../../components/Button'
 import { SectionTitle } from '../../components/SectionTitle'
 import { Badge } from '../../components/Badge'
+import { SkeletonProductGrid, SkeletonCard } from '../../components/SkeletonLoader'
 import { Link } from 'react-router-dom'
 import { useProducts } from '../../lib/hooks/useProducts'
 import { useAddToCart } from '../../lib/hooks/useCart'
@@ -94,7 +95,7 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 export function HomePage() {
-  const { data: products } = useProducts()
+  const { data: products, isLoading: isLoadingProducts } = useProducts()
   const { data: sustainableGiftingItems, isLoading: isLoadingSustainableGifting, isError: isErrorSustainableGifting } = useSustainableGifting()
   
   // Dynamic text sizing for hero section
@@ -227,7 +228,9 @@ export function HomePage() {
             subtitle="Curated collections of premium, sustainable treats"
             align="center"
           />
-          {featuredHampers.length > 0 ? (
+          {isLoadingProducts ? (
+            <SkeletonProductGrid count={3} />
+          ) : featuredHampers.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredHampers.map((product) => (
                 <ProductCard key={product.id} product={product} />
@@ -246,7 +249,9 @@ export function HomePage() {
             subtitle="Sugar-free, organic, and guilt-free treats that delight"
             align="center"
           />
-          {healthyIndulgences.length > 0 ? (
+          {isLoadingProducts ? (
+            <SkeletonProductGrid count={3} />
+          ) : healthyIndulgences.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {healthyIndulgences.map((product) => (
                 <ProductCard key={product.id} product={product} />

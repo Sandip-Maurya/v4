@@ -106,6 +106,8 @@ Premium, health-conscious, eco-aware customers and luxury gift buyers who value 
 - **Smooth Animations** — Subtle hover effects, transitions, and micro-interactions
 - **Accessibility** — Keyboard navigation, ARIA labels, and semantic HTML
 - **Toast Notifications** — User-friendly feedback for actions using React Hot Toast
+- **Skeleton Loaders** — Beautiful shimmer animations during content loading (similar to Facebook/YouTube)
+- **Scroll-to-Top Navigation** — Automatic scroll reset to top when navigating between pages
 
 #### 🔧 Technical Features
 - **Mock API Integration** — MSW (Mock Service Worker) for development
@@ -161,8 +163,10 @@ dolce-v4/
 │   │   ├── FilterSidebar.tsx  # Product filtering UI
 │   │   ├── MainLayout.tsx  # App layout (header, footer)
 │   │   ├── Modal.tsx       # Modal dialog component
+│   │   ├── ScrollToTop.tsx # Scroll-to-top on route change
 │   │   ├── SearchBar.tsx   # Search input component
 │   │   ├── SectionTitle.tsx # Section heading component
+│   │   ├── SkeletonLoader.tsx # Loading skeleton components
 │   │   └── SortDropdown.tsx # Sorting dropdown
 │   ├── features/          # Feature-based modules
 │   │   ├── auth/          # Authentication pages
@@ -319,6 +323,51 @@ The application uses **MSW (Mock Service Worker)** for API mocking during develo
 - **Tailwind Utilities** — Use Tailwind classes for styling
 - **Custom Colors** — Brand colors defined in `tailwind.config.js`
 - **Responsive Breakpoints** — Use `sm:`, `md:`, `lg:`, `xl:`, `2xl:` prefixes
+
+### Skeleton Loaders
+
+The application uses **SkeletonLoader** components to provide smooth loading experiences similar to Facebook and YouTube. These components display animated placeholders while content is being fetched from the API.
+
+#### Features
+
+- **Shimmer Animation** — Smooth left-to-right shimmer effect during loading
+- **Multiple Types** — Support for card, text, image, and custom skeleton types
+- **Pre-built Components** — Ready-to-use `SkeletonCard`, `SkeletonProductGrid`, and `SkeletonText` components
+- **Consistent Design** — Matches the app's design system with beige color palette
+- **Automatic Footer Hiding** — Footer is hidden during loading to keep focus on main content
+
+#### Usage
+
+```tsx
+import { SkeletonProductGrid, SkeletonCard } from '../../components/SkeletonLoader'
+
+// Show skeleton grid while loading
+{isLoading ? (
+  <SkeletonProductGrid count={6} />
+) : (
+  <ProductGrid products={products} />
+)}
+```
+
+The skeleton loaders automatically appear when React Query detects that data is being fetched, providing users with visual feedback that content is loading.
+
+### Scroll-to-Top Navigation
+
+The application automatically scrolls to the top of the page whenever users navigate to a new route. This ensures a consistent user experience across all devices (desktop, tablet, mobile).
+
+#### Behavior
+
+- **Automatic Reset** — Scroll position resets to top (0, 0) on every route change
+- **Instant Scroll** — No animation delay for immediate feedback
+- **Works Everywhere** — Applies to all navigation methods:
+  - Clicking navigation links (Products, Orders, etc.)
+  - Clicking the home logo (Dolce Fiore)
+  - Programmatic navigation
+  - Browser back/forward buttons
+
+#### Implementation
+
+The `ScrollToTop` component is integrated into `MainLayout`, ensuring it works for all routes automatically. It uses React Router's `useLocation` hook to detect route changes and scrolls the window to the top instantly.
 
 ## API Documentation
 

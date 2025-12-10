@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useIsFetching } from '@tanstack/react-query'
 import { Container } from './Container'
+import { ScrollToTop } from './ScrollToTop'
 import { useCart } from '../lib/hooks/useCart'
 import { useUser, useLogout } from '../lib/hooks/useAuth'
 
@@ -20,6 +22,10 @@ export function MainLayout({ children }: MainLayoutProps) {
   const { data: cart } = useCart()
   const { data: user } = useUser()
   const logoutMutation = useLogout()
+  
+  // Detect if any queries are currently fetching
+  const isFetching = useIsFetching()
+  const isLoading = isFetching > 0
 
   // Calculate total cart item count from cart items
   const cartItemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0
@@ -127,6 +133,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <ScrollToTop />
       <header className="bg-white border-b border-beige-200 sticky top-0 z-40">
         <Container>
           <nav ref={menuRef} className="flex items-center justify-between h-16 lg:h-20">
@@ -390,9 +397,10 @@ export function MainLayout({ children }: MainLayoutProps) {
         </Container>
       </header>
 
-      <main className="flex-grow">{children}</main>
+      <main className={`flex-grow ${isLoading ? 'min-h-[60vh]' : ''}`}>{children}</main>
 
-      <footer className="bg-charcoal-900 text-beige-100 mt-auto relative" tabIndex={-1}>
+      {!isLoading && (
+        <footer className="bg-charcoal-900 text-beige-100 mt-auto relative">
         <Container>
           {/* Decorative Top Accent Line */}
           <div className="flex items-center justify-center pt-12 sm:pt-16 pb-8 opacity-60">
@@ -624,6 +632,7 @@ export function MainLayout({ children }: MainLayoutProps) {
           </div>
         </Container>
       </footer>
+      )}
     </div>
   )
 }

@@ -101,3 +101,7 @@ coverage/
 # ---------------------------------------------------
 # Avoid ignoring mock data inside /mocks (they belong in git)
 # Avoid ignoring /assets (we want to version premium placeholders)
+
+
+# Ignore .sh file
+*.sh

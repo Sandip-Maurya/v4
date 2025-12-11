@@ -10,6 +10,7 @@ import { OrdersPage } from '../features/orders/OrdersPage'
 import { LoginPage } from '../features/auth/LoginPage'
 import { SignupPage } from '../features/auth/SignupPage'
 import { ProfilePage } from '../features/profile/ProfilePage'
+import { AboutUsPage } from '../features/about/AboutUsPage'
 
 export const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ export const router = createBrowserRouter([
   {
     path: '/products/:slug',
     element: <MainLayout><ProductDetailPage /></MainLayout>,
+  },
+  {
+    path: '/about',
+    element: <MainLayout><AboutUsPage /></MainLayout>,
   },
   {
     path: '/cart',

@@ -8,6 +8,9 @@ import { useProducts } from '../../lib/hooks/useProducts'
 import { useAddToCart } from '../../lib/hooks/useCart'
 import { useDynamicTextSize } from '../../lib/hooks/useDynamicTextSize'
 import { useSustainableGifting } from '../../lib/hooks/useSustainableGifting'
+import { useTextTestimonials, useVideoTestimonials } from '../../lib/hooks/useTestimonials'
+import { TextTestimonialCard } from '../../components/TextTestimonialCard'
+import { VideoTestimonialCard } from '../../components/VideoTestimonialCard'
 import type { Product } from '../../lib/api/endpoints/catalog'
 import toast from 'react-hot-toast'
 
@@ -97,6 +100,8 @@ function ProductCard({ product }: { product: Product }) {
 export function HomePage() {
   const { data: products, isLoading: isLoadingProducts } = useProducts()
   const { data: sustainableGiftingItems, isLoading: isLoadingSustainableGifting, isError: isErrorSustainableGifting } = useSustainableGifting()
+  const { data: textTestimonials, isLoading: isLoadingTextTestimonials } = useTextTestimonials()
+  const { data: videoTestimonials, isLoading: isLoadingVideoTestimonials } = useVideoTestimonials()
   
   // Dynamic text sizing for hero section
   const titleSize = useDynamicTextSize<HTMLHeadingElement>({
@@ -388,6 +393,82 @@ export function HomePage() {
               all wrapped in eco-friendly, reusable packaging.
             </p>
           </div>
+        </div>
+
+        {/* Testimonials Section */}
+        <div className="pt-12 sm:pt-16 pb-12 sm:pb-16">
+          <SectionTitle
+            title="What Our Customers Say"
+            subtitle="Real stories from people who love Dolce Fiore"
+            align="center"
+          />
+
+          {/* Text Testimonials */}
+          {isLoadingTextTestimonials ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-xl shadow-card overflow-hidden">
+                  <div className="p-6 space-y-4">
+                    <div className="h-4 bg-beige-200 rounded w-24 animate-pulse"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-beige-200 rounded animate-pulse"></div>
+                      <div className="h-4 bg-beige-200 rounded w-5/6 animate-pulse"></div>
+                      <div className="h-4 bg-beige-200 rounded w-4/6 animate-pulse"></div>
+                    </div>
+                    <div className="pt-4 border-t border-beige-200 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-beige-200 animate-pulse"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-beige-200 rounded w-3/4 animate-pulse"></div>
+                        <div className="h-3 bg-beige-200 rounded w-1/2 animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : textTestimonials && textTestimonials.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+              {textTestimonials.map((testimonial) => (
+                <TextTestimonialCard key={testimonial.id} testimonial={testimonial} />
+              ))}
+            </div>
+          ) : null}
+
+          {/* Video Testimonials */}
+          {isLoadingVideoTestimonials ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+              {[1, 2].map((i) => (
+                <div key={i} className="bg-white rounded-xl shadow-card overflow-hidden">
+                  <div className="aspect-video w-full bg-beige-200 animate-pulse"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="h-4 bg-beige-200 rounded w-24 animate-pulse"></div>
+                    <div className="pt-4 border-t border-beige-200 flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-full bg-beige-200 animate-pulse"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-beige-200 rounded w-3/4 animate-pulse"></div>
+                        <div className="h-3 bg-beige-200 rounded w-1/2 animate-pulse"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : videoTestimonials && videoTestimonials.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+              {videoTestimonials.map((testimonial) => (
+                <VideoTestimonialCard key={testimonial.id} testimonial={testimonial} />
+              ))}
+            </div>
+          ) : null}
+
+          {/* Empty State */}
+          {!isLoadingTextTestimonials && !isLoadingVideoTestimonials &&
+           (!textTestimonials || textTestimonials.length === 0) &&
+           (!videoTestimonials || videoTestimonials.length === 0) && (
+            <div className="text-center text-charcoal-600 mt-12">
+              <p>Customer testimonials coming soon...</p>
+            </div>
+          )}
         </div>
       </Container>
     </div>

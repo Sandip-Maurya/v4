@@ -146,3 +146,47 @@ export function SkeletonText({ lines = 3, className = '' }: { lines?: number; cl
   )
 }
 
+export function SkeletonPhotoGallery({ count = 6 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white rounded-xl shadow-card overflow-hidden animate-pulse"
+        >
+          <div className="aspect-square w-full bg-beige-200 shimmer"></div>
+          <div className="p-4">
+            <div className="h-4 bg-beige-200 shimmer rounded w-3/4 mx-auto mt-4"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function SkeletonBlogPost({ count = 3 }: { count?: number }) {
+  return (
+    <div className="space-y-8">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white rounded-xl shadow-card overflow-hidden animate-pulse"
+        >
+          <div className="p-6 space-y-4">
+            <div className="h-6 bg-beige-200 shimmer rounded w-3/4"></div>
+            <div className="h-4 bg-beige-200 shimmer rounded w-1/4"></div>
+            <div className="space-y-2">
+              <div className="h-4 bg-beige-200 shimmer rounded w-full"></div>
+              <div className="h-4 bg-beige-200 shimmer rounded w-5/6"></div>
+              <div className="h-4 bg-beige-200 shimmer rounded w-4/6"></div>
+            </div>
+            {i === 0 && (
+              <div className="aspect-video w-full bg-beige-200 shimmer rounded mt-4"></div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+

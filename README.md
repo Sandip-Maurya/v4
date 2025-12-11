@@ -57,7 +57,18 @@ Premium, health-conscious, eco-aware customers and luxury gift buyers who value 
 - **Featured Hampers** — Curated showcase of premium gift hampers
 - **Healthy Indulgences** — Sugar-free and guilt-free product highlights
 - **Sustainable Gifting** — Dynamic content section with images, titles, and descriptions loaded from backend API
+- **Testimonials** — Text-based and video-based customer testimonials dynamically loaded from backend API
 - **Brand Story** — Narrative about Dolce Fiore's journey and values
+
+#### ℹ️ About Us Page
+- **About Us Section** — Company introduction with default fallback content
+- **Our Story Section** — Brand history and journey with default fallback content
+- **Our Commitment Section** — Sustainability and values content managed by backend
+- **Photo Gallery** — Grid layout showcasing company photos with skeleton loaders
+- **Blog Section** — Blog posts with images, dates, and content managed by backend
+- **Testimonials** — Reuses testimonials from home page
+- **Error Handling** — Comprehensive error handling with fallback content to prevent layout distortion
+- **Skeleton Loaders** — Beautiful loading states for all sections
 
 #### 🛍️ Product Catalog
 - **Product Listing** — Responsive grid layout displaying all products
@@ -167,7 +178,9 @@ dolce-v4/
 │   │   ├── SearchBar.tsx   # Search input component
 │   │   ├── SectionTitle.tsx # Section heading component
 │   │   ├── SkeletonLoader.tsx # Loading skeleton components
-│   │   └── SortDropdown.tsx # Sorting dropdown
+│   │   ├── SortDropdown.tsx # Sorting dropdown
+│   │   ├── TextTestimonialCard.tsx # Text testimonial card component
+│   │   └── VideoTestimonialCard.tsx # Video testimonial card component
 │   ├── features/          # Feature-based modules
 │   │   ├── auth/          # Authentication pages
 │   │   │   ├── LoginPage.tsx
@@ -204,7 +217,8 @@ dolce-v4/
 │   │       ├── useCart.ts
 │   │       ├── useOrders.ts
 │   │       ├── useProducts.ts
-│   │       └── useSustainableGifting.ts
+│   │       ├── useSustainableGifting.ts
+│   │       └── useTestimonials.ts
 │   ├── mocks/             # Mock data and API handlers
 │   │   ├── browser.ts     # MSW browser setup
 │   │   ├── handlers.ts    # API request handlers
@@ -360,7 +374,7 @@ The application automatically scrolls to the top of the page whenever users navi
 - **Automatic Reset** — Scroll position resets to top (0, 0) on every route change
 - **Instant Scroll** — No animation delay for immediate feedback
 - **Works Everywhere** — Applies to all navigation methods:
-  - Clicking navigation links (Products, Orders, etc.)
+  - Clicking navigation links (Home, Products, Orders, etc.)
   - Clicking the home logo (Dolce Fiore)
   - Programmatic navigation
   - Browser back/forward buttons
@@ -368,6 +382,28 @@ The application automatically scrolls to the top of the page whenever users navi
 #### Implementation
 
 The `ScrollToTop` component is integrated into `MainLayout`, ensuring it works for all routes automatically. It uses React Router's `useLocation` hook to detect route changes and scrolls the window to the top instantly.
+
+### Navigation Bar
+
+The application features a consistent navigation bar across all screens with the following structure:
+
+#### Navigation Links
+
+- **Home** — Links to the home page (`/`)
+- **Products** — Links to the product catalog (`/products`)
+- **About Us** — Links to the About Us page (`/about`)
+- **Orders** — Links to order history (`/orders`)
+- **Cart** — Shopping cart icon with item count badge (links to `/cart`)
+- **Login/Signup** — Authentication links (shown when user is not logged in)
+- **User Menu** — Profile dropdown menu (shown when user is logged in)
+
+#### Navigation Features
+
+- **Logo Link** — The "Dolce Fiore" logo on the left side of the navigation bar also links to the home page (`/`)
+- **Active State** — Current page is highlighted with an underline (desktop) or left border (mobile)
+- **Responsive Design** — Desktop shows all links horizontally; mobile uses a hamburger menu
+- **Cart Badge** — Displays the total number of items in the cart
+- **User Menu** — Dropdown menu with profile link and logout option when authenticated
 
 ## API Documentation
 
@@ -598,6 +634,147 @@ GET /api/content/sustainable-gifting/
 ```
 
 This endpoint returns active sustainable gifting items ordered by their `order` field. The frontend uses this data to dynamically display the Sustainable Gifting section on the home page.
+
+#### Get Text Testimonials
+```http
+GET /api/content/testimonials/text/
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "John Doe",
+    "text": "Amazing products! Highly recommend.",
+    "rating": 5,
+    "location": "Mumbai, India",
+    "image_url": "https://images.unsplash.com/...",
+    "order": 0
+  }
+]
+```
+
+#### Get Video Testimonials
+```http
+GET /api/content/testimonials/video/
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Jane Smith",
+    "text": "Love the sustainable packaging!",
+    "video_url": "https://www.youtube.com/embed/...",
+    "rating": 5,
+    "location": "Delhi, India",
+    "image_url": "https://images.unsplash.com/...",
+    "order": 0
+  }
+]
+```
+
+These endpoints return active testimonials ordered by their `order` field. The frontend displays text testimonials in a card grid and video testimonials with embedded YouTube/Vimeo videos.
+
+#### Get About Us Section
+```http
+GET /api/content/about-us/
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "title": "About Us",
+  "content": "At Dolce Fiore, we are passionate about...",
+  "order": 0,
+  "is_active": true
+}
+```
+
+Returns the active About Us section. If no active section exists, returns default fallback content.
+
+#### Get Our Story Section
+```http
+GET /api/content/our-story/
+```
+
+**Response:**
+```json
+{
+  "id": "uuid",
+  "title": "Our Story",
+  "content": "Dolce Fiore began as a homegrown venture...",
+  "order": 0,
+  "is_active": true
+}
+```
+
+Returns the active Our Story section. If no active section exists, returns default fallback content.
+
+#### Get Our Commitment Sections
+```http
+GET /api/content/our-commitment/
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "title": "Sustainability",
+    "content": "We are committed to...",
+    "order": 0,
+    "is_active": true
+  }
+]
+```
+
+Returns all active Our Commitment sections ordered by their `order` field.
+
+#### Get Photo Gallery Items
+```http
+GET /api/content/photo-gallery/
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "title": "Workshop Photo",
+    "image_url": "https://images.unsplash.com/...",
+    "order": 0,
+    "is_active": true
+  }
+]
+```
+
+Returns all active photo gallery items ordered by their `order` field.
+
+#### Get Blog Posts
+```http
+GET /api/content/blogs/
+```
+
+**Response:**
+```json
+[
+  {
+    "id": "uuid",
+    "title": "Sustainable Packaging Tips",
+    "content": "In this blog post, we explore...",
+    "image_url": "https://images.unsplash.com/...",
+    "published_date": "2024-01-15",
+    "order": 0,
+    "is_active": true
+  }
+]
+```
+
+Returns all active blog posts ordered by published date (newest first), then by `order` field.
 
 ## Future Plans & Improvements
 

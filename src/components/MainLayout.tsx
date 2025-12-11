@@ -31,7 +31,9 @@ export function MainLayout({ children }: MainLayoutProps) {
   const cartItemCount = cart?.items.reduce((sum, item) => sum + item.quantity, 0) || 0
 
   const navLinks = [
+    { to: '/', label: 'Home' },
     { to: '/products', label: 'Products' },
+    { to: '/about', label: 'About Us' },
     { to: '/orders', label: 'Orders' },
   ]
 
